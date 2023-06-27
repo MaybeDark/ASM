@@ -41,11 +41,9 @@ public class ArrayTool {
     }
 
     public static boolean notNull(Object[] a){
-        if (a == null || a.length == 0){
-            return false;
-        }
-        return true;
+        return a != null && a.length != 0;
     }
+
     public static boolean allNotNull(Object[] a){
         if (a == null || a.length == 0){
             return false;

@@ -12,7 +12,6 @@ public class ConvertTool {
         return result;
     }
 
-
     public static int B2I(final byte[] bytes){
         int result = 0;
         int length = bytes.length;

@@ -1,8 +1,8 @@
 package org.tools;
 
-import org.constantpool.ConstantPool;
-import org.constantpool.ReferenceKind;
-import org.constantpool.info.*;
+import org.bytecode.constantpool.ConstantPool;
+import org.bytecode.constantpool.ReferenceKind;
+import org.bytecode.constantpool.info.*;
 
 import java.nio.charset.StandardCharsets;
 

@@ -7,26 +7,25 @@ import java.nio.charset.Charset;
 
 @RunnerTime("这是运行时注解")
 @NotRunnerTime("这是编译时注解")
-public class Test3 implements Say{
-
-    @Nullable
-    public int a;
-    public float c = 4.5F;
-    public static final String b = "1";
-
-    @Resource
-    public Test t;
+public class Test3 extends Test4 implements Say{
+    public int a = 0;
+//    public float c = 4.5F;
+//    public static final String b = "1";
+//    public Test t;
 
     public Test3(int a,Test t){
-        this.a = a;
-        this.t = t;
+//        super("张三");
+        a = 1;
+        t = new Test("张三");
+//        this.a = a;
+//        this.t = t;
     }
     static{
         System.out.println("张三");
     }
 
-    public void setA(int a)throws Exception{
-        this.a = a;
+    public void setA(int a){
+        a=1;
     }
 
     @Deprecated

@@ -1,8 +1,10 @@
 package org.wrapper;
 
+import com.sun.istack.internal.NotNull;
 import org.Loadable;
 import org.Type;
-import org.constantpool.ConstantPool;
+import org.bytecode.constantpool.ConstantPool;
+import org.exception.NotNullException;
 import org.exception.TypeErrorException;
 
 public class FieldWrapper implements Loadable<ConstantPool> {
@@ -13,11 +15,19 @@ public class FieldWrapper implements Loadable<ConstantPool> {
     private boolean loaded = false;
     private short fieldInfoIndex;
     private Type type;
-    public FieldWrapper(String fullClassName,String fieldName,Type type){
-        this.type = type;
-        if (type.isMethodType()){
-            throw new TypeErrorException("field type cannot be a method");
+
+    public FieldWrapper(@NotNull Type classType,@NotNull  String filedName,@NotNull Type filedType){
+        this(classType.getFullClassName(),filedName,filedType);
+    }
+
+    public FieldWrapper(@NotNull String fullClassName,@NotNull  String fieldName, @NotNull Type type){
+        if (type == null){
+            throw new NotNullException("type cannot be null");
         }
+        if (type.isMethodType() || type.isVoidType()){
+            throw new TypeErrorException("wrong field type");
+        }
+        this.type = type;
         fieldDesc = type.getDescriptor();
         this.fieldName = fieldName;
         this.fullClassName = fullClassName;

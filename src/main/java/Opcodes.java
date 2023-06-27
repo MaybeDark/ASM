@@ -341,6 +341,7 @@ public interface Opcodes {
     int INVOKESTATIC = 184;     //通过运行时常量池调用静态方法
     int INVOKEINTERFACE = 185; //通过运行时常量池调用接口方法
     int INVOKEDYNAMIC = 186;    //调用Lambda表达式和默认方法 'invokedynamic 运行时常量池索引(invokeDynamic)'
+
     int NEW = 187;          //'new 运行时常量池索引(class)' 为新对象分配空间并初始化成员方法
     int NEWARRAY = 188;     //'newarray 数组类型对应的值' 从操作数栈中弹出一个int类型的值作为数组的长度
     int ANEWARRAY = 189;    //'anewarray 运行时常量池索引(class)' 从操作数栈中弹出一个int类型的值作为数组的长度
@@ -351,8 +352,8 @@ public interface Opcodes {
     int MONITORENTER = 194; //从操作数栈中弹出一个引用类型，通过这个引用类型找到该对象的monitor尝试获取monitor的所有权
     int MONITOREXIT = 195;  //从操作数栈中弹出一个引用类型，通过这个引用类型找到该对象的monitor尝试释放monitor的所有权
     // int WIDE = 196;      // NOT VISITED
-
     int MULTIANEWARRAY = 197; //创建多维数组 ’multianewarray 运行时常量池索引(class) dim 维度‘n位数组会弹出n个int类型操作数
+
     //if(value __ null)
     //'if___null index'
     int IFNULL = 198; //从操作数栈弹出一个值，如果等于null则跳转到index开始执行

@@ -2,10 +2,9 @@ package org.wrapper;
 
 import org.Loadable;
 import org.Type;
-import org.constantpool.ConstantPool;
+import org.bytecode.constantpool.ConstantPool;
 import com.sun.istack.internal.Nullable;
 import org.exception.TypeErrorException;
-import org.tools.DescTool;
 
 public class MethodWrapper implements Loadable<ConstantPool> {
     private final String fullClassName;
@@ -17,6 +16,13 @@ public class MethodWrapper implements Loadable<ConstantPool> {
     private boolean loaded = false;
     private short  methodInfoIndex;
     private Type returnType;
+    public MethodWrapper(Type classType, String methodName, @Nullable Type returnType, Type... parameterType){
+        this(classType.getFullClassName(),methodName,returnType,parameterType);
+    }
+
+    public MethodWrapper(Type classType, String methodName,Type methodType){
+        this(classType.getFullClassName(),methodName,methodType);
+    }
 
     public MethodWrapper(String fullClassName, String methodName, @Nullable Type returnType, Type... parameterType){
         this.fullClassName = fullClassName;
@@ -26,19 +32,21 @@ public class MethodWrapper implements Loadable<ConstantPool> {
     }
 
     public MethodWrapper(String fullClassName, String methodName,Type methodType){
+        this.fullClassName = fullClassName;
+        this.methodName = methodName;
+        if (methodType == null) {
+            parseMethod(null, null);
+            return;
+        }
         if (!methodType.isMethodType()) {
             throw new TypeErrorException("type must be is a method type");
         }
-        this.fullClassName = fullClassName;
-        this.methodName = methodName;
         parseMethod(methodType);
     }
 
     private void parseMethod(Type methodType){
         parseMethod(Type.getReturnType(methodType),Type.getArgumentTypes(methodType));
     }
-
-
 
     private void parseMethod(@Nullable Type returnType,@Nullable Type[] parameterType){
         this.methodDesc =Type.getMethodDescriptor(returnType,parameterType);
@@ -60,6 +68,11 @@ public class MethodWrapper implements Loadable<ConstantPool> {
         methodInfoIndex = constantPool.putMethodrefInfo(fullClassName, methodName, methodDesc);
         return methodInfoIndex;
     }
+
+    public static MethodWrapper buildConstructor(String fullClassName,Type... parameterType){
+        return new MethodWrapper(fullClassName,"<init>",Type.VOID,parameterType);
+    }
+
 
     public String getFullClassName() {
         return fullClassName;

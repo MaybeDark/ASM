@@ -2,7 +2,7 @@ package org.wrapper;
 
 import org.Loadable;
 import org.Type;
-import org.constantpool.ConstantPool;
+import org.bytecode.constantpool.ConstantPool;
 import org.exception.TypeErrorException;
 
 public class LocalVariableWrapper implements Loadable<ConstantPool>{
