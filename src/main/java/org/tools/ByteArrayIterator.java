@@ -11,6 +11,7 @@ public class ByteArrayIterator{
         this.value = value;
         this.length = value.length;
     }
+
     public boolean hasNext(){
         return index < this.length;
     }

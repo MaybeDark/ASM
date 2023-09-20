@@ -4,10 +4,14 @@ import com.sun.istack.internal.NotNull;
 
 public class ArrayTool {
     public static byte[] join(@NotNull byte b,@NotNull byte[] a2){
-        byte[] a1 = new byte[1];
-        a1[0] = b;
+        byte[] a1 = {b};
         return join(a1, a2);
     }
+    public static byte[] join(@NotNull byte[] a1,@NotNull byte b){
+        byte[] a2 = {b};
+        return join(a1, a2);
+    }
+
     public static byte[] join(@NotNull byte[] a1,@NotNull byte[] a2){
         if (a1 == null || a1.length == 0){
             return a2;
@@ -19,7 +23,6 @@ public class ArrayTool {
             System.arraycopy(a2,0,newArray,a1.length,a2.length);
             return newArray;
         }
-
     }
 
     public static<T> T[] join(@NotNull T b,@NotNull T[] a2){
@@ -41,11 +44,9 @@ public class ArrayTool {
     }
 
     public static boolean notNull(Object[] a){
-        if (a == null || a.length == 0){
-            return false;
-        }
-        return true;
+        return a != null && a.length != 0;
     }
+
     public static boolean allNotNull(Object[] a){
         if (a == null || a.length == 0){
             return false;

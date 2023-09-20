@@ -1,11 +1,43 @@
 package TestPackage;
 
 
-import java.util.Date;
+import org.bytecode.attributes.method.code.instruction.InstructionSet;
 
 public class Test4 {
+    int a = 0;
+    int b = a;
     public static void main(String[] args){
+        System.out.println(InstructionSet.LXOR.getOpcode());
+//        {
+//            long d = 8L;
+//            long e = 9L;
+//            System.out.println(d);
+//            if (d > 0) {
+//                long b = 0L;
+//                long a = 0L;
+//                System.out.println(a + b);
+//            }
+//        }
+//        long c = 0L;
+//        {
+//            long ab = 1L;
+//            System.out.println(ab);
+//        }
+//        System.out.println(c);
 
+//        ClassWrapper classWrapper = new ClassWrapper(Test4.class);
+//        String fullClassName = classWrapper.getFullClassName();
+//        {
+//            int a = 10;
+//            System.out.println(a);
+//        }
+//        Test4 test4 = new Test4();
+//        byte a = (byte) 0xB2;
+//        System.out.println(a);
+//        InstructionSet i2b = InstructionSet.I2B;
+//        float a = 1F;
+//        float b = 2F;
+//        boolean b1 = a == b;
 //        Class<Integer[]> testClass = Integer[].class;
 //        System.out.println(testClass.getName());
 //        System.out.println(Type.getDescriptor(Integer[].class));
@@ -40,8 +72,33 @@ public class Test4 {
 //        MethodWrapper methodWrapper1 = new MethodWrapper(Type.getClassDescriptor(Test.class),"say",Type.DOUBLE,null);
 //        methodWrapper.load(cp);
 //        methodWrapper1.load(cp);
-//
-//        Code code = new Code(Type.INT, localVariableWrapper, localVariableWrapper1);
+//        ConstantPool constantPool = new ConstantPool();
+//        FieldWrapper out = new FieldWrapper("java/lang/System", "out", Type.getType(PrintStream.class));
+//        out.load(constantPool);
+//        MethodWrapper println = new MethodWrapper(Type.getType(PrintStream.class), "println", Type.getType(Type.getMethodDescriptor(Type.VOID, Type.BOOLEAN)));
+//        println.load(constantPool);
+//        LocalVariableWrapper localVariableWrapper = new LocalVariableWrapper("args", Type.getType(String[].class));
+//        Code code = new Code(null,localVariableWrapper);
+//        code.loadFromConstant(InstructionSet.ICONST_1);
+//        code.storeToLocals("a");
+//        code.loadFromConstant(InstructionSet.ICONST_2);
+//        code.storeToLocals("b");
+//        code.loadOrSetField(InstructionSet.GETSTATIC,out);
+//        code.loadFromLocals((short) 1);
+//        code.loadFromLocals((short) 2);
+//        code.startIf(InstructionSet.IF_ICMPNE);
+//        code.loadFromConstant(InstructionSet.ICONST_1);
+//        code.jumpTo((short) 4);
+//        code.endIf();
+//        code.loadFromConstant(InstructionSet.ICONST_0);
+//        code.invokeMethod(InstructionSet.INVOKEVIRTUAL,println);
+//        code.endCode();
+//        System.out.println(code.list());
+//        System.out.println(code.getLocals().list());
+//        System.out.println(code.getAttributeLength());
+//        Class<Test2> test2Class = Test2.class;
+//        Method[] methods = test2Class.getMethods();
+//        Method method = methods[0];
 //        code.addInvokeInstruction(InstructionSet.INVOKESTATIC,methodWrapper1);
 //        code.addInvokeInstruction(InstructionSet.INVOKESTATIC,methodWrapper1);
 //        code.addInvokeInstruction(InstructionSet.INVOKESTATIC,methodWrapper);

@@ -1,8 +1,8 @@
 package org.tools;
 
-import org.constantpool.ConstantPool;
-import org.constantpool.ReferenceKind;
-import org.constantpool.info.*;
+import org.bytecode.constantpool.ConstantPool;
+import org.bytecode.constantpool.ReferenceKind;
+import org.bytecode.constantpool.info.*;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,8 +12,7 @@ public class ConstantPoolTool {
         short index = 1;
         short count = ConvertTool.B2S(bai.next(2));
         while (index < count) {
-            sLabel:
-            switch (bai.next()) {
+            sLabel:switch (bai.next()) {
                 case 1:
                     short length = ConvertTool.B2S(bai.next(2));
                     String str = new String(bai.next(length), StandardCharsets.UTF_8);
@@ -129,7 +128,7 @@ public class ConstantPoolTool {
                     nameAndTypeCpIndex = ConvertTool.B2S(bai.next(2));
                     ConstantPoolNameAndTypeInfo cpnti = (ConstantPoolNameAndTypeInfo) cp.get(nameAndTypeCpIndex);
                     short bootstrapMethodIndex = ConvertTool.B2S(bai.next(2));
-                    cp.putInvokeDynamicInfo(cpnti.getName(), cpnti.getDesc(), bootstrapMethodIndex);
+                    cp.putInvokeDynamicInfo(cpnti.getName(), cpnti.getDesc(),bootstrapMethodIndex);
                     index++;
                     break sLabel;
                 default:

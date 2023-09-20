@@ -2,10 +2,10 @@ package org.wrapper;
 
 import org.Loadable;
 import org.Type;
-import org.constantpool.ConstantPool;
+import org.bytecode.constantpool.ConstantPool;
 import org.exception.TypeErrorException;
 
-public class LocalVariableWrapper implements Loadable<ConstantPool>{
+public class LocalVariableWrapper {
     private int startPc;
     private int length;
     private int end;
@@ -65,7 +65,6 @@ public class LocalVariableWrapper implements Loadable<ConstantPool>{
         if (type.isDoubleType() || type.isLongType()){
             size = 2;
         }
-
     }
 
     public short getTableIndex(){
@@ -91,7 +90,6 @@ public class LocalVariableWrapper implements Loadable<ConstantPool>{
         return descCpIndex;
     }
 
-    @Override
     public short load(ConstantPool cp) {
        nameCpIndex = cp.putUtf8Info(name);
        descCpIndex = cp.putUtf8Info(desc);

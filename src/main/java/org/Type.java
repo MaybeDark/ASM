@@ -6,7 +6,9 @@ import org.exception.InvalidDescriptorException;
 import org.exception.NoSupportException;
 import org.exception.NotNullException;
 import org.exception.TypeErrorException;
+import org.tools.ArrayTool;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +37,8 @@ public final class Type {
     public static final Type LONG = new Type(7, "L");
     public static final Type DOUBLE = new Type(8, "D");
     public static final Type NULL = new Type(12,"null");
+    public static final Type STRING = new Type(12,"Ljava/lang/String;");
+
     private static final Map<Class<?>, String> transforms = new HashMap<>();
     static {
         transforms.put(Void.TYPE, "V");
@@ -49,11 +53,11 @@ public final class Type {
     }
 
     private final int code;
-    private String value;
+    private String desc;
 
-    private Type(int code, String value) {
+    private Type(int code, String desc) {
         this.code = code;
-        this.value = value;
+        this.desc = desc;
     }
 
     public static String getClassDescriptor(@NotNull Class<?> clazz) {
@@ -75,6 +79,15 @@ public final class Type {
         return sb.toString();
     }
 
+    public static String getClassDescriptor(@NotNull String fullClassName){
+        StringBuilder sb = new StringBuilder();
+        sb.append('L');
+        sb.append(fullClassName);
+        sb.append(';');
+        return sb.toString();
+    }
+
+
     public static String getMethodDescriptor(@Nullable Class<?> returnType, @Nullable Class<?>... argumentTypes) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
@@ -94,23 +107,52 @@ public final class Type {
         return sb.toString();
     }
 
-    public static String getMethodDescriptor(@NotNull Type returnType, @Nullable Type... argumentTypes) {
+    public static String getMethodDescriptor(Method targetMethod) {
+       return getMethodDescriptor(targetMethod.getReturnType(),targetMethod.getParameterTypes());
+    }
+
+    public static String getMethodDescriptor(@Nullable Type returnType, @Nullable Type... argumentTypes) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
-        if (argumentTypes != null && argumentTypes.length != 0) {
+        if (ArrayTool.notNull(argumentTypes)) {
             for (Type argumentType : argumentTypes) {
                 if (argumentType == null || argumentType.equals(Type.VOID))
                     break;
-                sb.append(argumentType.value);
+                sb.append(argumentType.desc);
             }
         }
         sb.append(')');
         if (returnType == null || returnType.equals(Type.VOID)) {
             sb.append('V');
         } else {
-            sb.append(returnType.value);
+            sb.append(returnType.desc);
         }
         return sb.toString();
+    }
+
+    public static Type getType(@NotNull final char descriptor){
+        switch (descriptor) {
+            case 'B':
+                return BYTE;
+            case 'C':
+                return CHAR;
+            case 'D':
+                return DOUBLE;
+            case 'F':
+                return FLOAT;
+            case 'I':
+                return INT;
+            case 'J':
+                return LONG;
+            case 'S':
+                return SHORT;
+            case 'V':
+                return VOID;
+            case 'Z':
+                return BOOLEAN;
+            default:
+                throw new InvalidDescriptorException("Invalid descriptor: \"" + descriptor + "\"");
+        }
     }
 
     public static Type getType(@NotNull final String descriptor) {
@@ -118,28 +160,7 @@ public final class Type {
             throw new NotNullException("argument0 must be not null");
         }
         if (descriptor.length() == 1) {
-            switch (descriptor.charAt(0)) {
-                case 'B':
-                    return BYTE;
-                case 'C':
-                    return CHAR;
-                case 'D':
-                    return DOUBLE;
-                case 'F':
-                    return FLOAT;
-                case 'I':
-                    return INT;
-                case 'J':
-                    return LONG;
-                case 'S':
-                    return SHORT;
-                case 'V':
-                    return VOID;
-                case 'Z':
-                    return BOOLEAN;
-                default:
-                    throw new InvalidDescriptorException("Invalid descriptor: \"" + descriptor + "\"");
-            }
+            return getType(descriptor.charAt(0));
         } else if (descriptor.startsWith("L"))
             return new Type(OBJECT_CODE, descriptor);
         else if (descriptor.startsWith("("))
@@ -182,6 +203,17 @@ public final class Type {
         }
     }
 
+    public static Type[] getType(@NotNull Class<?>[] classes){
+        if (!ArrayTool.notNull(classes)){
+            return null;
+        }
+        Type[] types = new Type[classes.length];
+        for (int i = 0; i < classes.length; i++) {
+            types[i] = Type.getType(classes[i]);
+        }
+        return types;
+    }
+
     public static Type[] getArgumentTypes(@NotNull final String methodDescriptor) {
         if (methodDescriptor == null || methodDescriptor.isEmpty()) {
             throw new NotNullException("argument0 must be not null");
@@ -208,7 +240,7 @@ public final class Type {
             StringBuilder sb = new StringBuilder();
             for (char c : argsDesc) {
                 sb.append(c);
-                if ((sb.length() == 0 && isPrimitiveType(c)) || c == ';') {
+                if ((sb.length() == 1 && isPrimitiveType(c)) || c == ';') {
                     container[count++] = getType(sb.toString());
                     sb.setLength(0);
                 }
@@ -222,7 +254,10 @@ public final class Type {
         return result;
     }
 
-    public static Type getReturnType(@NotNull final Type methodType) {
+    public static Type getReturnType(@Nullable final Type methodType) {
+        if (methodType == null){
+            return VOID;
+        }
         if (!methodType.isMethodType()) {
             throw new TypeErrorException("type must be is a method type");
         }
@@ -245,7 +280,7 @@ public final class Type {
         return getType(returnDescriptor);
     }
 
-    public static Type getComponentType(Class<?> arrayClass) {
+    public static Type getElementType(Class<?> arrayClass) {
         if (arrayClass == null) {
             throw new RuntimeException("parameter 'arrayClass' must be not null");
         } else if (!arrayClass.isArray()) {
@@ -255,16 +290,22 @@ public final class Type {
         return getType(componentClass);
     }
 
-    public static Type getComponentType(Type type) {
+    public static Type getElementType(Type type) {
         if (!type.isArrayType()) {
-            throw new RuntimeException("Unexpected pop a " + type.getDescriptor() + ",not a arrayref");
+            throw new TypeErrorException(type.getDescriptor() + " not a array type");
         }
         String comDesc = type.getDescriptor().substring(1);
         return getType(comDesc);
     }
 
-    public static boolean isPrimitiveType(Type type) {
-        return type.code <= 8 && type.code >= 1;
+    public static Type getArrayType(Type componentType){
+        return getType("[" + componentType.getDescriptor());
+    }
+
+
+
+    public boolean isPrimitiveType() {
+        return code <= 8 && code >= 1;
     }
 
     public static boolean isPrimitiveType(String descriptor) {
@@ -290,7 +331,10 @@ public final class Type {
         }
     }
 
-    public static Type[] getArgumentTypes(Type methodType) {
+    public static Type[] getArgumentTypes(@NotNull Type methodType) {
+        if (methodType == null){
+            throw new RuntimeException("methodType must be not null");
+        }
         if (!methodType.isMethodType()) {
             throw new TypeErrorException("type must be is a method type");
         }
@@ -298,11 +342,25 @@ public final class Type {
     }
 
     public String getDescriptor() {
-        return value;
+        return desc;
+    }
+
+    public String getFullClassName(){
+        if (!(isObjectType() || isArrayType()))
+            throw new TypeErrorException(getDescriptor() + " not an object type");
+        String descriptor = getDescriptor();
+        if (descriptor.startsWith("L")){
+            descriptor = descriptor.substring(1, descriptor.length() - 1);
+        }
+        return descriptor;
+    }
+
+    public boolean isLongOrDoubleType(){
+        return code == 7 || code == 8;
     }
 
     public boolean isObjectType() {
-        return code == 9;
+        return code == 10;
     }
 
     public boolean isVoidType() {
@@ -330,12 +388,12 @@ public final class Type {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Type type = (Type) o;
-        return code == type.code && Objects.equals(value, type.value);
+        return code == type.code && Objects.equals(desc, type.desc);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, value);
+        return Objects.hash(code, desc);
     }
 
     public boolean isArrayType() {
