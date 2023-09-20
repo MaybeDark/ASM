@@ -1,12 +1,9 @@
 package org.bytecode.constantpool;
 
-import org.bytecode.cls.attribute.bootstrapmethod.BootstrapMethod;
-import org.bytecode.cls.attribute.bootstrapmethod.BootstrapMethods;
 import org.bytecode.constantpool.info.AbsConstantPoolInfo;
-import org.other.Pool;
 
 @SuppressWarnings("all")
-public abstract class AbsConstantPool implements Pool {
+public abstract class AbsConstantPool{
     public short constantPoolCount = 1;
     public abstract short putUtf8Info(String value);
     public abstract short putIntegerInfo(Integer value);
@@ -21,7 +18,7 @@ public abstract class AbsConstantPool implements Pool {
     public abstract short putNameAndTypeInfo(String name,String desc);
     public abstract short putMethodTypeInfo(String methodDesc);
     public abstract short putMethodHandleInfo(ReferenceKind referenceKind,String fullClassName,String name,String methodDesc);
-    public abstract short putInvokeDynamicInfo(BootstrapMethods bmp, String methodName, String methodDesc, BootstrapMethod bootStrapMethod);
+    public abstract short putInvokeDynamicInfo(String methodName, String methodDesc,short index);
     public abstract AbsConstantPoolInfo get(int index);
     public abstract byte[] toByteArray();
 }

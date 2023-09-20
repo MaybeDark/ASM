@@ -1,17 +1,92 @@
 package TestPackage;
 
-import org.Access;
 import org.Type;
-import org.bytecode.BytecodeFactory;
+import org.bytecode.ClassWriter;
+import org.bytecode.attributes.clazz.SourceFile;
+import org.bytecode.field.FieldWriter;
+import org.bytecode.method.MethodWriter;
+import org.bytecode.attributes.method.code.attrubute.LineNumberTable;
+import org.wrapper.ClassWrapper;
+import org.wrapper.FieldWrapper;
+import org.wrapper.MethodWrapper;
+
+import java.util.Arrays;
 
 import static org.Access.*;
 
 @Deprecated
 public  class Test5 {
 
+    public static void main(String[] args) throws NoSuchFieldException, NoSuchMethodException {
+//        FieldWrapper a = new FieldWrapper(Test6.class.getDeclaredField("A"));
+        MethodWrapper say = new MethodWrapper(Test6.class.getConstructor());
+        ClassWriter classWriter = new ClassWriter(ACC_PUBLIC+ACC_SUPER,"TestPackage/Test6");
+        FieldWriter A = classWriter.addField(0, "A", Type.STRING);
+        LineNumberTable lineNumberTable = new LineNumberTable().put(0,6).put(6,7).put(16,8);
+        MethodWriter methodWriter = classWriter.addInterfaces(Say.class)
+                .addMethod(ACC_PUBLIC, "say", Type.STRING)
+                .loadLocal("this")
+                .loadString("张三")
+                .storeField(A.wrapper(), false)
+                .loadField(new FieldWrapper("java/lang/System", "out", Type.getType("Ljava/io/PrintStream;")), true)
+                .loadLocal("this")
+                .loadField(A.wrapper(), false)
+                .invokeVirtual(new MethodWrapper("java/io/PrintStream", "println", Type.VOID, Type.STRING))
+                .loadLocal("this")
+                .loadField(A.wrapper(), false);
+        methodWriter.getCode().addAttribute(lineNumberTable);
+        methodWriter.endMethod();
+        System.out.println(Arrays.toString(classWriter.toByteArray()));
+        
+//        MethodWriter methodWriter3 = classWriter.addAttribute(new SourceFile("Test6.java"))
+//                .addConstructor(ACC_PUBLIC, null);
+////
+//        methodWriter3.getCode()
+//                .addAttribute(new LineNumberTable().put(0,6));
+//        methodWriter3.endMethod().toByteArray();
+//        MethodPool methods = classWriter.getMethods();
+//        Method method1 = methods.getByName("say").get(0);
+//        Method method2 = methods.getByName("<init>").get(0);
+//        method1.load(classWriter.getConstantPool());
+//        method1.load(classWriter.getConstantPool());
+        System.out.println(classWriter.getConstantPool().print());
 
-    public static void main(String[] args) {
+//        String print = method.print();
+//        System.out.println(print);
+//        String print1 = method3.print();
+//        System.out.println(print1);
+//        System.out.println(Arrays.toString(methodWriter.toByteArray()));
+//        System.out.println(Arrays.toString(methodWriter3.toByteArray()));
 
+//        System.out.println(Arrays.toString(method1.toByteArray()));
+
+//        System.out.println(method.print());
+
+//        byte[] bytes = classWriter.toByteArray();
+//        System.out.println(Arrays.toString(bytes));
+//        System.out.println(classWriter.getConstantPool().print());
+
+//        FileOutputStream fos = null;
+//        try {
+//            fos = new FileOutputStream("Test6.class");
+//            fos.write(bytes);
+//            fos.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+//        byte[] bytes = classWriter.toByteArray();
+//        System.out.println(Arrays.toString(bytes));
+//        byte[] bytes = ConvertTool.F2B(3.2F);
+//        System.out.println(ConvertTool.B2F(bytes));
+//        int[][][] ints = new int[10][][];
+//        System.out.println(Arrays.toString(ints[0]));
+
+//        Code code = new Code(Type.VOID,Type.INT);
+//        code.multiANewArray(Type.INT,2,10,-1);
+//        if(ints instanceof int[][][]){
+//
+//        }
 //        Type type = Type.getType(String.class);
 //        System.out.println(type.getDescriptor());
 

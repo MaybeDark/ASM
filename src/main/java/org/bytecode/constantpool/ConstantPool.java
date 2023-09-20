@@ -1,37 +1,18 @@
 package org.bytecode.constantpool;
 
-import org.bytecode.cls.attribute.bootstrapmethod.BootstrapMethod;
-import org.bytecode.cls.attribute.bootstrapmethod.BootstrapMethods;
 import org.bytecode.constantpool.info.*;
-import org.other.Pool;
 import org.tools.ArrayTool;
+import org.tools.ByteVector;
 import org.tools.ConvertTool;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("all")
-public class ConstantPool extends AbsConstantPool implements Pool {
-    public final static short defaultSize = 32;
-    public static int expansionFactor = 2;
-    public short currentSize = defaultSize;
-    AbsConstantPoolInfo[] pool;
-    Map<Integer, Short> hash2Index = new HashMap<>();
-
-    public ConstantPool() {
-        constantPoolCount = 1;
-        pool = new AbsConstantPoolInfo[defaultSize];
-    }
-
-    private ConstantPool(short constantPoolCount) {
-        this.constantPoolCount = constantPoolCount;
-        while (constantPoolCount >= currentSize) {
-            currentSize *= expansionFactor;
-        }
-        pool = new AbsConstantPoolInfo[currentSize];
-    }
-
+public class ConstantPool extends AbsConstantPool{
+    private final ArrayList<AbsConstantPoolInfo> pool = new ArrayList<>();
+    private final Map<Integer, Short> hash2Index = new HashMap<>();
 
     @Override
     public short putUtf8Info(String str) {
@@ -153,21 +134,20 @@ public class ConstantPool extends AbsConstantPool implements Pool {
         return putInfo(info);
     }
 
-    @Override
-    public short putInvokeDynamicInfo(BootstrapMethods bmp, String methodName, String methodDesc, BootstrapMethod bootStrapMethod) {
-        bootStrapMethod.setValue(resolveBootstrapMethod(bootStrapMethod));
+    public short putInvokeDynamicInfo(String methodName, String methodDesc,short index) {
         short nameAndTypeInfoIndex = putNameAndTypeInfo(methodName, methodDesc);
-        short bootStrapMethodIndex = bmp.putBootStrapMethod(bootStrapMethod);
-        byte[] ref = ArrayTool.join(ConvertTool.S2B(nameAndTypeInfoIndex), ConvertTool.S2B(bootStrapMethodIndex));
+        byte[] ref = ArrayTool.join(ConvertTool.S2B(nameAndTypeInfoIndex), ConvertTool.S2B(index));
         ConstantPoolInvokeDynamicInfo info = new ConstantPoolInvokeDynamicInfo(methodName, methodDesc, ref);
         return putInfo(info);
     }
 
-    public short putInvokeDynamicInfo(String methodName, String methodDesc, short bootStrapMethodIndex) {
-        short nameAndTypeInfoIndex = putNameAndTypeInfo(methodName, methodDesc);
-        byte[] ref = ArrayTool.join(ConvertTool.S2B(nameAndTypeInfoIndex), ConvertTool.S2B(bootStrapMethodIndex));
-        ConstantPoolInvokeDynamicInfo info = new ConstantPoolInvokeDynamicInfo(methodName, methodDesc, ref);
-        return putInfo(info);
+    private short putInfo(AbsConstantPoolInfo info) {
+        Short value = hash2Index.putIfAbsent(info.hashCode(), constantPoolCount);
+        if (value != null && value != constantPoolCount) {
+            return value;
+        }
+        pool.add(info);
+        return constantPoolCount++;
     }
 
     @Override
@@ -175,7 +155,7 @@ public class ConstantPool extends AbsConstantPool implements Pool {
         if (index == 0 || index >= constantPoolCount) {
             throw new RuntimeException("ConstanlPool index must be greater than 0 and less than constantPoolCount");
         }
-        return pool[index - 1];
+        return pool.get(index - 1);
     }
 
     @Override
@@ -183,27 +163,14 @@ public class ConstantPool extends AbsConstantPool implements Pool {
         int size = 0;
         size += 2; //length mark;
         for (int i = 0; i < constantPoolCount - 1; i++) {
-            size += pool[i].getLength();
+            size += pool.get(i).getLength();
         }
-        byte[] result = new byte[size];
-        int length = 0;
-        System.arraycopy(ConvertTool.S2B(constantPoolCount), 0, result, 0, 2);
-        length += 2;
+        ByteVector result = new ByteVector(size);
+        result.putShort(constantPoolCount);
         for (int i = 0; i < constantPoolCount - 1; i++) {
-            System.arraycopy(pool[i].toByteArray(), 0, result, length, pool[i].getLength());
-            length += pool[i].getLength();
+           result.putArray(pool.get(i).toByteArray());
         }
-        return result;
-    }
-
-    private short putInfo(AbsConstantPoolInfo info) {
-        considerExpansion();
-        Short value = hash2Index.putIfAbsent(info.hashCode(), constantPoolCount);
-        if (value != null && value != constantPoolCount) {
-            return value;
-        }
-        pool[constantPoolCount - 1] = info;
-        return constantPoolCount++;
+        return result.end();
     }
 
     public short resolveConstantPoolInfo(AbsConstantPoolInfo scpi) {
@@ -267,51 +234,38 @@ public class ConstantPool extends AbsConstantPool implements Pool {
         return infoIndex;
     }
 
-    public byte[] resolveBootstrapMethod(BootstrapMethod bm) {
-        int argsIndex = 0;
-        int argsCount = bm.getArgsCount();
-        byte[] result = new byte[2 + 2 + argsCount * 2];
+//    public byte[] resolveBootstrapMethod(BootstrapMethod bm) {
+//        int argsIndex = 0;
+//        int argsCount = bm.getArgsCount();
+//        byte[] result = new byte[2 + 2 + argsCount * 2];
+//        int methodHandleInfoIndex = putMethodHandleInfo(bm.getReferenceKind(), bm.getFullClassName(), bm.getMethodName(), bm.getMethodDesc());
+//        System.arraycopy(ConvertTool.S2B((short) methodHandleInfoIndex), 0, result, 0, 2);
+//        System.arraycopy(ConvertTool.S2B((short) argsCount), 0, result, 2, 2);
+//        List<Parameterizable> args = bm.getArgs();
+//        if (args == null) {
+//            return result;
+//        }
+//        for (int i = 0; i < argsCount; i++) {
+//            Parameterizable arg = args.get(i);
+//            int infoIndex = resolveConstantPoolInfo((AbsConstantPoolInfo) arg);
+//            args.set(i, (Parameterizable) get(infoIndex));
+//            System.arraycopy(ConvertTool.S2B((short) infoIndex), 0, result, 4 + 2 * (argsIndex++), 2);
+//        }
+//        return result;
+//    }
 
-        int methodHandleInfoIndex = putMethodHandleInfo(bm.getReferenceKind(), bm.getFullClassName(), bm.getMethodName(), bm.getMethodDesc());
-        System.arraycopy(ConvertTool.S2B((short) methodHandleInfoIndex), 0, result, 0, 2);
-        System.arraycopy(ConvertTool.S2B((short) argsCount), 0, result, 2, 2);
-        List<Parameterizable> args = bm.getArgs();
-        if (args == null) {
-            return result;
-        }
-        for (int i = 0; i < argsCount; i++) {
-            Parameterizable arg = args.get(i);
-            int infoIndex = resolveConstantPoolInfo((AbsConstantPoolInfo) arg);
-            args.set(i, (Parameterizable) get(infoIndex));
-            System.arraycopy(ConvertTool.S2B((short) infoIndex), 0, result, 4 + 2 * (argsIndex++), 2);
-        }
-        return result;
-    }
+//    @Override
+//    public AbsConstantPoolInfo[] getPool() {
+//        AbsConstantPoolInfo[] result = new AbsConstantPoolInfo[constantPoolCount - 1];
+//        System.arraycopy(pool, 0, result, 0, constantPoolCount - 1);
+//        return result;
+//    }
 
-    private void considerExpansion() {
-        if (constantPoolCount <= currentSize)
-            return;
-        if (currentSize * expansionFactor >= (1 << 15)) {
-            throw new RuntimeException("pool too large");
-        }
-        AbsConstantPoolInfo[] newPool = new AbsConstantPoolInfo[currentSize * expansionFactor];
-        System.arraycopy(pool, 0, newPool, 0, currentSize);
-        currentSize *= expansionFactor;
-        pool = newPool;
-    }
-
-    @Override
-    public AbsConstantPoolInfo[] getPool() {
-        AbsConstantPoolInfo[] result = new AbsConstantPoolInfo[constantPoolCount - 1];
-        System.arraycopy(pool, 0, result, 0, constantPoolCount - 1);
-        return result;
-    }
-
-    public String list() {
+    public String print() {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < constantPoolCount - 1; i++) {
-            AbsConstantPoolInfo absConstantPoolInfo = pool[i];
+            AbsConstantPoolInfo absConstantPoolInfo = pool.get(i);
             sb.append(String.format("[%02d]", i + 1));
             sb.append(String.format("%-35s", absConstantPoolInfo.getTag()));
             if (absConstantPoolInfo instanceof LiteralConstantPoolInfo) {
@@ -325,4 +279,5 @@ public class ConstantPool extends AbsConstantPool implements Pool {
         }
         return sb.toString();
     }
+
 }

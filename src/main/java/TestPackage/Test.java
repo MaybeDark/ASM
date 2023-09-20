@@ -49,15 +49,15 @@ public class Test {
         byte[] b = classWriter.toByteArray();
 //        Class<?> aClass = new TestPackage.MyClassLoader().findClass(null, b, 0, b.length);
 //        System.out.println(aClass.getMethods()[0].getName());
-        System.out.println(Arrays.toString(b));
-//        FileOutputStream fos = null;
-//        try {
-//            fos = new FileOutputStream("TestPackage.Test3.class");
-//            fos.write(b);
-//            fos.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+//        System.out.println(Arrays.toString(b));
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream("Test3.class");
+            fos.write(b);
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 //        ClassReader cr = new ClassReader(TestPackage.MyClassLoader.getSystemResourceAsStream("TestPackage.Test3.class"));
 //        ClassWriter cw = new ClassWriter(0);
 //        ClassVisitor cv = new ClassVisitor(ASM4, cw) {

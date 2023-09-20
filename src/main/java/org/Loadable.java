@@ -1,7 +1,5 @@
 package org;
 
-import org.other.Pool;
-
 /**
  * 可加载到常量池的
  */

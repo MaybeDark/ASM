@@ -23,7 +23,6 @@ public interface Access{
 //    short ACC_MANDATED = 0x8000;
 //    short ACC_DEPRECATED = 0x20000;
 
-
     static boolean isPublic(int access){
         return isAay(access,ACC_PUBLIC);
     }
@@ -92,10 +91,98 @@ public interface Access{
         return isAay(access,ACC_ENUM);
     }
 
+    static boolean isSuper(int access){return isAay(access,ACC_SUPER);}
+
     static boolean isAay(int access,int any){
         return (access & any) == any;
     }
 
+    static String parseFieldAccess(final int access){
+        StringBuilder result = new StringBuilder();
+        if (isPublic(access))
+            result.append("public ");
+        else if (isPrivate(access))
+            result.append("private ");
+        else if (isProtected(access))
+            result.append("protected ");
+        if (isStatic(access))
+            result.append("static ");
+        if (isFinal(access))
+            result.append("final ");
+        if (isVolatile(access))
+            result.append("volatile ");
+        if (isTransient(access))
+            result.append("transient ");
+        if (isSynthetic(access))
+            result.append("synthetic ");
+        if (result.length() != 0)
+            result.deleteCharAt(result.length() - 1);
+        return result.toString();
+    }
+
+    static String parseMethodAccess(final int access){
+        StringBuilder result = new StringBuilder();
+        if (isPublic(access))
+            result.append("public ");
+        else if (isPrivate(access))
+            result.append("private ");
+        else if (isProtected(access))
+            result.append("protected ");
+
+        if (isStatic(access))
+            result.append("static ");
+        if (isFinal(access))
+            result.append("final ");
+        if(isSynchronized(access))
+            result.append("synchronized ");
+        if(isBridge(access))
+            result.append("bridge ");
+        if (isVarargs(access))
+            result.append("varargs ");
+        if (isNative(access))
+            result.append("native ");
+
+        if (isAbstract(access))
+            result.append("abstract ");
+        if (isStrict(access))
+            result.append("strict ");
+        if (result.length() != 0)
+            result.deleteCharAt(result.length() - 1);
+        return result.toString();
+    }
+
+    public static String parseClassAccess(int access){
+        StringBuilder result = new StringBuilder();
+        if (isPublic(access))
+            result.append("public ");
+        else if (isPrivate(access))
+            result.append("private ");
+        else if (isProtected(access))
+            result.append("protected ");
+
+        if (isStatic(access))
+            result.append("static ");
+        if (isFinal(access))
+            result.append("final ");
+        if (isSuper(access))
+            result.append("super ");
+        if (isSynthetic(access))
+            result.append("synthetic ");
+        if (isAbstract(access))
+            result.append("abstract ");
+
+        if (isInterface(access))
+            result.append("interface ");
+        if (isAnnotation(access))
+            result.append("annotation");
+        if (isEnum(access))
+            result.append("enum ");
+
+        if (result.length() != 0)
+            result.deleteCharAt(result.length() - 1);
+
+        return result.toString();
+    }
 }
 
 //public enum Access {

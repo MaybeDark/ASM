@@ -1,34 +1,35 @@
 package org.wrapper;
 
 
-import org.Loadable;
 import org.Type;
 import org.bytecode.constantpool.ConstantPool;
 import org.exception.TypeErrorException;
 
 import java.util.Objects;
 
-public class ClassWrapper implements Loadable<ConstantPool> {
-    private final String fullClassName;
+public class ClassWrapper {
+    private final String className;
     private Type type;
     private short cpIndex;
     private boolean loaded = false;
 
     public ClassWrapper(Class<?> clazz){
         this.type = Type.getType(clazz);
-        this.fullClassName = type.getFullClassName();
+        this.className = type.getFullClassName();
     }
 
     public ClassWrapper(Type type){
-        if (!type.isObjectType())
-            throw new TypeErrorException(type.getDescriptor() + " not an object type");
+        if (!(type.isObjectType()|| type.isArrayType()))
+            throw new TypeErrorException(type.getDescriptor() + " not an object or array type ");
         this.type = type;
-        this.fullClassName = type.getFullClassName();
+        this.className = type.getFullClassName();
     }
 
     public short load(ConstantPool constantPool){
+        if (loaded)
+            return cpIndex;
+        cpIndex = constantPool.putClassInfo(className);
         loaded = true;
-        cpIndex = constantPool.putClassInfo(fullClassName);
         return cpIndex;
     }
 
@@ -42,7 +43,7 @@ public class ClassWrapper implements Loadable<ConstantPool> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fullClassName);
+        return Objects.hash(className);
     }
 
     public boolean isLoaded() {
@@ -57,7 +58,7 @@ public class ClassWrapper implements Loadable<ConstantPool> {
         return cpIndex;
     }
 
-    public String getFullClassName() {
-        return fullClassName;
+    public String getClassName() {
+        return className;
     }
 }

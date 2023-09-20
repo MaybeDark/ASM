@@ -7,17 +7,20 @@ import org.bytecode.constantpool.ConstantPool;
 import org.exception.NotNullException;
 import org.exception.TypeErrorException;
 
-public class FieldWrapper implements Loadable<ConstantPool> {
+import java.lang.reflect.Field;
+
+public class FieldWrapper{
 
     private final String fullClassName;
     private final String fieldName;
-    private final String fieldDesc;
     private boolean loaded = false;
     private short fieldInfoIndex;
     private Type type;
 
-    public FieldWrapper(@NotNull Type classType,@NotNull  String filedName,@NotNull Type filedType){
-        this(classType.getFullClassName(),filedName,filedType);
+    public FieldWrapper(@NotNull Field field){
+        type = Type.getType(field.getType());
+        fieldName = field.getName();
+        fullClassName = Type.getType(field.getDeclaringClass()).getFullClassName();
     }
 
     public FieldWrapper(@NotNull String fullClassName,@NotNull  String fieldName, @NotNull Type type){
@@ -28,35 +31,24 @@ public class FieldWrapper implements Loadable<ConstantPool> {
             throw new TypeErrorException("wrong field type");
         }
         this.type = type;
-        fieldDesc = type.getDescriptor();
         this.fieldName = fieldName;
         this.fullClassName = fullClassName;
     }
 
     public short load(ConstantPool constantPool){
-        fieldInfoIndex =constantPool.putFieldrefInfo(fullClassName, fieldName, fieldDesc);
+        if (loaded)
+            return fieldInfoIndex;
+        fieldInfoIndex =constantPool.putFieldrefInfo(fullClassName, fieldName, type.getDescriptor());
         loaded = true;
         return fieldInfoIndex;
     }
 
-    public String getFullClassName() {
+    public String getClassName() {
         return fullClassName;
     }
 
     public String getFieldName() {
         return fieldName;
-    }
-
-    public String getFieldDesc() {
-        return fieldDesc;
-    }
-
-    public short getFieldInfoIndex() {
-        return fieldInfoIndex;
-    }
-
-    public boolean isLoaded() {
-        return loaded;
     }
 
     public Type getType() {

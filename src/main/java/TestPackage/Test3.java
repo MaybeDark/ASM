@@ -34,8 +34,9 @@ public class Test3 extends Test4 implements Say{
     }
 
     @Override
-    public void say() {
+    public String say() {
         System.out.println("TestPackage.Say");
+        return "";
     }
 
     private void execute(Say say){

@@ -9,7 +9,7 @@ import org.tools.ConvertTool;
 public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolInfo implements Parameterizable {
     private final byte type;
     private final String fullClassName;
-    private final String name;
+    private String name;
     private final String desc;
 
     public ConstantPoolMethodHandleInfo(byte type, String fullClassName, String name, String desc,byte[] ref) {
@@ -40,7 +40,7 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
 
     @Override
     public String valueToString() {
-        return String.format("%s #%d",getKind(),ConvertTool.B2S(new byte[]{value[1],value[2]}));
+        return String.format("%s #%d",getKind(),ConvertTool.B2S(value[1],value[2]));
     }
 
     public String getDesc() {
@@ -54,4 +54,9 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
     public String getName() {
         return name;
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
 }

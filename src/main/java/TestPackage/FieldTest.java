@@ -1,12 +1,6 @@
 package TestPackage;
 
-import org.Access;
 import org.Type;
-import org.bytecode.method.Method;
-import org.bytecode.method.attribute.code.Code;
-import org.wrapper.LocalVariableWrapper;
-
-import java.util.Arrays;
 
 public class FieldTest {
     int a = 1;
@@ -36,7 +30,7 @@ public class FieldTest {
 //        Type type = Type.getType("Ljava/lang/Object;");
 //        System.out.println(type.getFullClassName());
 
-        Method say = new Method(Access.ACC_PUBLIC+Access.ACC_SUPER, "java/lang/Object", "say", Type.VOID);
-        System.out.println(say);
+//        Method say = new Method(Access.ACC_PUBLIC+Access.ACC_SUPER, "java/lang/Object", "say", Type.VOID);
+//        System.out.println(say);
     }
 }

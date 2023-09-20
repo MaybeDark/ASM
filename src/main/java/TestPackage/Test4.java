@@ -1,9 +1,7 @@
 package TestPackage;
 
 
-import org.InstructionSet;
-
-import java.lang.reflect.Method;
+import org.bytecode.attributes.method.code.instruction.InstructionSet;
 
 public class Test4 {
     int a = 0;
