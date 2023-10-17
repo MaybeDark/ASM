@@ -1,7 +1,7 @@
 package TestPackage;
 
 
-import org.bytecode.attributes.method.code.instruction.InstructionSet;
+import org.bytecode.attributes.code.instruction.InstructionSet;
 
 public class Test4 {
     int a = 0;

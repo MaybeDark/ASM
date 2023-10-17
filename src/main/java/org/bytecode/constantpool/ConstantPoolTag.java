@@ -18,7 +18,7 @@ public enum ConstantPoolTag {
     CONSTANT_MethodType_info(0x10),
     CONSTANT_InvokeDynamic_info(0x12);
 
-    byte tagNum;
+    private final byte tagNum;
     ConstantPoolTag(int tagNum){
         this.tagNum = (byte) tagNum;
     }

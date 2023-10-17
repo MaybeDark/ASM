@@ -1,5 +1,6 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 
 public class ConstantPoolInvokeDynamicInfo extends SymbolicReferenceConstantPoolInfo{
@@ -14,7 +15,7 @@ public class ConstantPoolInvokeDynamicInfo extends SymbolicReferenceConstantPool
     }
 
     public ConstantPoolInvokeDynamicInfo(String methodName, String methodDesc) {
-        this(methodName,methodDesc,null);
+        this(methodName, methodDesc, null);
     }
 
     public String getMethodDesc() {
@@ -23,5 +24,10 @@ public class ConstantPoolInvokeDynamicInfo extends SymbolicReferenceConstantPool
 
     public String getMethodName() {
         return methodName;
+    }
+
+    @Override
+    public short load(ConstantPool constantPool) {
+        throw new RuntimeException("no support");
     }
 }

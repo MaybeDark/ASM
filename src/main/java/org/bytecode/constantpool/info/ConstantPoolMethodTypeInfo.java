@@ -1,5 +1,6 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 import org.bytecode.constantpool.Parameterizable;
 
@@ -13,11 +14,15 @@ public class ConstantPoolMethodTypeInfo extends SymbolicReferenceConstantPoolInf
     }
 
     public ConstantPoolMethodTypeInfo(String methodDesc) {
-        this(methodDesc,null);
+        this(methodDesc, null);
     }
 
     public String getMethodDesc() {
         return methodDesc;
     }
 
+    @Override
+    public short load(ConstantPool constantPool) {
+        return constantPool.putMethodTypeInfo(methodDesc);
+    }
 }

@@ -3,12 +3,14 @@ package org.bytecode.field;
 import org.Type;
 import org.bytecode.ByteCodeWriter;
 import org.bytecode.ClassWriter;
-import org.bytecode.attributes.common.Attribute;
+import org.bytecode.attributes.Attribute;
+import org.bytecode.attributes.Signature;
+import org.bytecode.attributes.Target;
 import org.bytecode.constantpool.ConstantPool;
-import org.exception.NotLoadException;
 import org.tools.ArrayTool;
 import org.tools.ByteVector;
 import org.wrapper.FieldWrapper;
+import org.wrapper.GenericWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,21 +19,47 @@ import java.util.Objects;
 public class FieldWriter implements ByteCodeWriter {
     public final ClassWriter classWriter;
     private int access;
-    private String fullClassName;
+    private String classInfo;
     private String name;
     private Type type;
-    private Map<String,Attribute> attributes = new HashMap<>();
+    private Map<String, Attribute> attributes = new HashMap<>();
 
-    public FieldWriter(ClassWriter classWriter,int access, String name, Type type){
+    /**
+     * @param classWriter 所属类
+     * @param access      权限修饰符
+     * @param name        变量名
+     * @param type        变量类型
+     */
+    public FieldWriter(ClassWriter classWriter, int access, String name, Type type) {
         this.classWriter = classWriter;
-        this.fullClassName = classWriter.thisClass.getClassName();
-        this.access =access;
+        this.classInfo = classWriter.thisClass.getClassInfo();
+        this.access = access;
         this.type = type;
         this.name = name;
     }
 
-    public FieldWriter addAttribute(Attribute attribute){
-        attributes.put(attribute.getAttributeName(),attribute);
+    /**
+     * @param classWriter 所属类
+     * @param access      权限修饰符
+     * @param name        变量名
+     * @param generic     泛型类型
+     */
+    public FieldWriter(ClassWriter classWriter, int access, String name, GenericWrapper generic) {
+        this.classWriter = classWriter;
+        this.classInfo = classWriter.thisClass.getClassInfo();
+        this.access = access;
+        this.name = name;
+        this.type = generic.getExtendsBy();
+        Signature signature = new Signature();
+        signature.setSignature(signature.getSignatureOfField(generic));
+        addAttribute(signature);
+    }
+
+
+    public FieldWriter addAttribute(Attribute attribute) {
+        if (! Target.check(attribute.target, Target.field_info))
+            throw new RuntimeException(attribute.getAttributeName() + "not a field attribute");
+        attributes.put(attribute.getAttributeName(), attribute);
         return this;
     }
 
@@ -45,8 +73,8 @@ public class FieldWriter implements ByteCodeWriter {
         return access;
     }
 
-    public String getFullClassName() {
-        return fullClassName;
+    public String getClassInfo() {
+        return classInfo;
     }
 
     public String getName() {
@@ -83,8 +111,8 @@ public class FieldWriter implements ByteCodeWriter {
         return attributes;
     }
 
-    public FieldWrapper wrapper(){
-        return new FieldWrapper(fullClassName,name,type);
+    public FieldWrapper wrapper() {
+        return new FieldWrapper(classInfo, name, type);
     }
 
     @Override
@@ -94,7 +122,6 @@ public class FieldWriter implements ByteCodeWriter {
         FieldWriter fieldWriter = (FieldWriter) o;
         return hashCode() == fieldWriter.hashCode();
     }
-
 
     @Override
     public int hashCode() {

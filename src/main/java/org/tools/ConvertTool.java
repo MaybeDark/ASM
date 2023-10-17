@@ -58,21 +58,25 @@ public class ConvertTool {
         return L2B(l);
     }
 
-    public static byte[] S2B(final short num){
+    public static byte[] S2B(final short num) {
         byte[] result = new byte[2];
         int index = 0;
         result[index++] = (byte) (num >>> 8);
-        result[index]   = (byte) num;
+        result[index] = (byte) num;
         return result;
     }
 
-    public static byte[] I2B(final int num){
+    public static byte[] S2B(int num) {
+        return S2B((short) num);
+    }
+
+    public static byte[] I2B(final int num) {
         byte[] result = new byte[4];
         int index = 0;
         result[index++] = (byte) (num >>> 24);
         result[index++] = (byte) (num >>> 16);
         result[index++] = (byte) (num >>> 8);
-        result[index]   = (byte) num;
+        result[index] = (byte) num;
         return result;
     }
 

@@ -2,17 +2,16 @@ package TestPackage;
 
 import org.Type;
 import org.bytecode.ClassWriter;
-import org.bytecode.attributes.clazz.SourceFile;
+import org.bytecode.attributes.linenumbertable.LineNumberTable;
 import org.bytecode.field.FieldWriter;
 import org.bytecode.method.MethodWriter;
-import org.bytecode.attributes.method.code.attrubute.LineNumberTable;
-import org.wrapper.ClassWrapper;
 import org.wrapper.FieldWrapper;
 import org.wrapper.MethodWrapper;
 
 import java.util.Arrays;
 
-import static org.Access.*;
+import static org.Access.ACC_PUBLIC;
+import static org.Access.ACC_SUPER;
 
 @Deprecated
 public  class Test5 {

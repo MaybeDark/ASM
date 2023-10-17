@@ -1,6 +1,8 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -22,10 +24,6 @@ public abstract class AbsConstantPoolInfo{
             return;
         this.value = value;
         this.length = value.length + TAG_LENGTH;
-    }
-
-    public ConstantPoolTag getType(){
-        return tag;
     }
 
     @Override
@@ -53,4 +51,5 @@ public abstract class AbsConstantPoolInfo{
         return length;
     }
 
+    public abstract short load(ConstantPool constantPool);
 }

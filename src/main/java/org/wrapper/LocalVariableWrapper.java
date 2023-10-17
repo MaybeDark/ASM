@@ -1,20 +1,19 @@
 package org.wrapper;
 
-import org.Loadable;
 import org.Type;
 import org.bytecode.constantpool.ConstantPool;
 import org.exception.TypeErrorException;
 
 public class LocalVariableWrapper {
+    private final boolean generic = false;
+    public boolean scopeEnd = false;
     private int startPc;
     private int length;
     private int end;
-    private final String name;
-
     private Type type;
     private String desc;
     private int size = 1;
-    private short tableIndex = -1;
+    private String name;
 
     /**
      * 初始化
@@ -23,78 +22,84 @@ public class LocalVariableWrapper {
      */
     private boolean initialized = false;
     private boolean loaded = false;
-    public boolean scopeEnd = false;
-    private boolean generic = false;
+    private short tableIndex = - 1;
 
 
     private short nameCpIndex;
     private short descCpIndex;
 
-//    public LocalVariableWrapper(int startPc, int length, String name,Type type) {
-//        this.startPc = startPc;
-//        this.length = length;
-//        this.end = startPc + length;
-//        this.name = name;
-//        this.type = type;
-//        this.desc = type.getDescriptor();
-//        if (type.isLongType() || type.isDoubleType())
-//            this.size = 2;
-//    }
-//
-//    public LocalVariableWrapper(int startPc, int length, String name, String desc){
-//        this.generic = true;
-//        this.startPc = startPc;
-//        this.length = length;
-//        this.end = startPc + length;
-//        this.name = name;
-//        this.type = null;
-//        this.desc = desc;
-//    }
-
-//    public LocalVariableWrapper(String name){
-//        this.name = name;
-//    }
-
-    public LocalVariableWrapper(String name,Type type){
+    public LocalVariableWrapper(String name, Type type) {
         this.name = name;
-        if (type.isMethodType()){
+        if (type.isMethodType()) {
             throw new TypeErrorException("type cannot be a method type");
         }
         this.type = type;
         this.desc = type.getDescriptor();
-        if (type.isDoubleType() || type.isLongType()){
+        if (type.isDoubleType() || type.isLongType()) {
             size = 2;
         }
     }
 
-    public short getTableIndex(){
+    public LocalVariableWrapper(String name, String desc) {
+        this(name, Type.getType(desc));
+    }
+
+    private LocalVariableWrapper() {
+    }
+
+    /**
+     * 用于visit
+     */
+    public static LocalVariableWrapper getEmptyWrapper() {
+        return new LocalVariableWrapper();
+    }
+
+    public short getTableIndex() {
         return tableIndex;
     }
 
-    public void setTableIndex(short tableIndex){
+    public void setTableIndex(short tableIndex) {
         this.tableIndex = tableIndex;
     }
+
     public int getStartPc() {
         return startPc;
+    }
+
+    public void setStartPc(int startPc) {
+        this.startPc = startPc;
     }
 
     public int getLength() {
         return length;
     }
 
+    public void setLength(int length) {
+        this.length = length;
+        this.end = startPc + length;
+    }
+
     public short getNameCpIndex() {
         return nameCpIndex;
+    }
+
+    public void setNameCpIndex(short nameCpIndex) {
+        this.nameCpIndex = nameCpIndex;
     }
 
     public short getDescCpIndex() {
         return descCpIndex;
     }
 
+    public void setDescCpIndex(short descCpIndex) {
+        this.descCpIndex = descCpIndex;
+    }
+
     public short load(ConstantPool cp) {
-       nameCpIndex = cp.putUtf8Info(name);
-       descCpIndex = cp.putUtf8Info(desc);
-       loaded = true;
-       return 0;
+        nameCpIndex = cp.putUtf8Info(name);
+        descCpIndex = cp.putUtf8Info(desc);
+        loaded = true;
+        return 0;
     }
 
     public Type getType() {
@@ -111,6 +116,7 @@ public class LocalVariableWrapper {
     public String getDesc() {
         return desc;
     }
+
     public boolean isLoaded() {
         return loaded;
     }
@@ -135,27 +141,11 @@ public class LocalVariableWrapper {
         return end;
     }
 
-    public void setStartPc(int startPc) {
-        this.startPc = startPc;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-        this.end = startPc + length;
-    }
-
     public void setEnd(int end) {
         this.end = end;
         this.length = end - startPc;
     }
 
-    public void setNameCpIndex(short nameCpIndex) {
-        this.nameCpIndex = nameCpIndex;
-    }
-
-    public void setDescCpIndex(short descCpIndex) {
-        this.descCpIndex = descCpIndex;
-    }
     public String getName() {
         return this.name;
     }

@@ -1,5 +1,6 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 import org.bytecode.constantpool.Parameterizable;
 import org.tools.ConvertTool;
@@ -13,11 +14,16 @@ public class ConstantPoolFloatInfo extends LiteralConstantPoolInfo<Float> implem
     }
 
     public ConstantPoolFloatInfo(float literal) {
-        super(ConstantPoolTag.CONSTANT_Float_info,literal,ConvertTool.F2B(literal));
+        super(ConstantPoolTag.CONSTANT_Float_info, literal, ConvertTool.F2B(literal));
     }
 
     @Override
     public String literalToString() {
-        return super.literalToString()+'F';
+        return super.literalToString() + 'F';
+    }
+
+    @Override
+    public short load(ConstantPool constantPool) {
+        return constantPool.putFloatInfo(literal);
     }
 }

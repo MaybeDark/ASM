@@ -1,7 +1,6 @@
 package org.wrapper;
 
 import com.sun.istack.internal.NotNull;
-import org.Loadable;
 import org.Type;
 import org.bytecode.constantpool.ConstantPool;
 import org.exception.NotNullException;
@@ -11,40 +10,40 @@ import java.lang.reflect.Field;
 
 public class FieldWrapper{
 
-    private final String fullClassName;
+    private final String classInfo;
     private final String fieldName;
     private boolean loaded = false;
     private short fieldInfoIndex;
     private Type type;
 
-    public FieldWrapper(@NotNull Field field){
+    public FieldWrapper(@NotNull Field field) {
         type = Type.getType(field.getType());
         fieldName = field.getName();
-        fullClassName = Type.getType(field.getDeclaringClass()).getFullClassName();
+        classInfo = Type.getType(field.getDeclaringClass()).getClassInfo();
     }
 
-    public FieldWrapper(@NotNull String fullClassName,@NotNull  String fieldName, @NotNull Type type){
-        if (type == null){
+    public FieldWrapper(@NotNull String classInfo, @NotNull String fieldName, @NotNull Type type) {
+        if (type == null) {
             throw new NotNullException("type cannot be null");
         }
-        if (type.isMethodType() || type.isVoidType()){
+        if (type.isMethodType() || type.isVoidType()) {
             throw new TypeErrorException("wrong field type");
         }
         this.type = type;
         this.fieldName = fieldName;
-        this.fullClassName = fullClassName;
+        this.classInfo = classInfo;
     }
 
     public short load(ConstantPool constantPool){
         if (loaded)
             return fieldInfoIndex;
-        fieldInfoIndex =constantPool.putFieldrefInfo(fullClassName, fieldName, type.getDescriptor());
+        fieldInfoIndex = constantPool.putFieldrefInfo(classInfo, fieldName, type.getDescriptor());
         loaded = true;
         return fieldInfoIndex;
     }
 
     public String getClassName() {
-        return fullClassName;
+        return classInfo;
     }
 
     public String getFieldName() {

@@ -1,5 +1,6 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 
 public class ConstantPoolNameAndTypeInfo extends SymbolicReferenceConstantPoolInfo{
@@ -14,7 +15,7 @@ public class ConstantPoolNameAndTypeInfo extends SymbolicReferenceConstantPoolIn
     }
 
     public ConstantPoolNameAndTypeInfo(String name,String desc){
-        this(name,desc,null);
+        this(name, desc, null);
     }
 
     public String getName() {
@@ -23,5 +24,10 @@ public class ConstantPoolNameAndTypeInfo extends SymbolicReferenceConstantPoolIn
 
     public String getDesc() {
         return desc;
+    }
+
+    @Override
+    public short load(ConstantPool constantPool) {
+        return constantPool.putNameAndTypeInfo(name, desc);
     }
 }

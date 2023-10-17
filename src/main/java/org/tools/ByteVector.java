@@ -75,14 +75,25 @@ public class ByteVector {
         return ConvertTool.B2L(bytes);
     }
 
-    public byte[] getArray(int length){
+    public byte[] getArray(int length) {
         byte[] bytes = new byte[length];
-        System.arraycopy(data,readPoint,bytes,0,length);
+        System.arraycopy(data, readPoint, bytes, 0, length);
         readPoint += length;
         return bytes;
     }
 
-    public boolean isEmpty(){
+    public void skip(int length) {
+        if (length >= data.length || length < 0) {
+            throw new RuntimeException("args0 must be >0 and <= size");
+        }
+        readPoint += length;
+    }
+
+    public void reset() {
+        readPoint = 0;
+    }
+
+    public boolean isEmpty() {
         return writePoint == 0;
     }
 
@@ -90,10 +101,12 @@ public class ByteVector {
         return writePoint;
     }
 
-    public byte[] end(){
-        if (isEmpty()){ return null; }
+    public byte[] end() {
+        if (isEmpty()) {
+            return null;
+        }
         byte[] result = new byte[writePoint];
-        System.arraycopy(data,0,result,0,writePoint);
+        System.arraycopy(data, 0, result, 0, writePoint);
         data = null;
         return result;
     }

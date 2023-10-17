@@ -8,27 +8,27 @@ import org.exception.TypeErrorException;
 import java.util.Objects;
 
 public class ClassWrapper {
-    private final String className;
+    private final String classInfo;
     private Type type;
     private short cpIndex;
     private boolean loaded = false;
 
     public ClassWrapper(Class<?> clazz){
         this.type = Type.getType(clazz);
-        this.className = type.getFullClassName();
+        this.classInfo = type.getClassInfo();
     }
 
     public ClassWrapper(Type type){
         if (!(type.isObjectType()|| type.isArrayType()))
             throw new TypeErrorException(type.getDescriptor() + " not an object or array type ");
         this.type = type;
-        this.className = type.getFullClassName();
+        this.classInfo = type.getClassInfo();
     }
 
     public short load(ConstantPool constantPool){
         if (loaded)
             return cpIndex;
-        cpIndex = constantPool.putClassInfo(className);
+        cpIndex = constantPool.putClassInfo(classInfo);
         loaded = true;
         return cpIndex;
     }
@@ -43,7 +43,7 @@ public class ClassWrapper {
 
     @Override
     public int hashCode() {
-        return Objects.hash(className);
+        return Objects.hash(classInfo);
     }
 
     public boolean isLoaded() {
@@ -58,7 +58,7 @@ public class ClassWrapper {
         return cpIndex;
     }
 
-    public String getClassName() {
-        return className;
+    public String getClassInfo() {
+        return classInfo;
     }
 }
