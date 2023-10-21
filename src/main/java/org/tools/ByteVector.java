@@ -2,14 +2,15 @@ package org.tools;
 
 public class ByteVector {
     private byte[] data;
-    private int writePoint,readPoint;
+    private int writePoint, readPoint, mark = 0;
 
     public ByteVector(final int initialSize) {
         data = new byte[initialSize];
     }
-    public ByteVector(final byte[] data){
-        this(data.length);
-        putArray(data);
+
+    public ByteVector(final byte[] data) {
+        this.data = data;
+        this.writePoint = data.length;
     }
 
     public ByteVector putByte(final int b) {
@@ -82,15 +83,23 @@ public class ByteVector {
         return bytes;
     }
 
+    public void mark() {
+        mark = readPoint;
+    }
+
+    public void back() {
+        readPoint = mark;
+    }
+
+    public void reset() {
+        readPoint = 0;
+    }
+
     public void skip(int length) {
         if (length >= data.length || length < 0) {
             throw new RuntimeException("args0 must be >0 and <= size");
         }
         readPoint += length;
-    }
-
-    public void reset() {
-        readPoint = 0;
     }
 
     public boolean isEmpty() {

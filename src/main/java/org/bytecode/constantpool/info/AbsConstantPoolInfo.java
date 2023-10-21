@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public abstract class AbsConstantPoolInfo{
-    protected final int TAG_LENGTH = 1;
+    public static final int TAG_LENGTH = 1;
     protected ConstantPoolTag tag;
     protected byte[] value;
     protected int length;

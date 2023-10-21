@@ -11,10 +11,25 @@ import org.tools.ByteVectors;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 注解信息
+ */
 public class AnnotationInfo {
+    /**
+     * 注解类名
+     */
     private final String annotationType;
+    /**
+     * 注解类名在常量池的索引{@link ConstantPoolUtf8Info}
+     */
     private short annotationTypeIndex = 0;
+    /**
+     * 参数条数
+     */
     private short elementValuePairsCount = 0;
+    /**
+     * 参数信息{@link ElementValuePairs}
+     */
     private Map<String, ElementValuePairs> pairs;
 
     public AnnotationInfo(Class<?> annotation) {
@@ -28,49 +43,6 @@ public class AnnotationInfo {
     AnnotationInfo(String annotationType) {
         this.annotationType = annotationType;
         pairs = new HashMap<>();
-    }
-
-    static AnnotationInfo visitAnnotation(ConstantPool constantPool, ByteVector byteVector) {
-        AnnotationInfo newAnnotationInfo = new AnnotationInfo(((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral());
-        for (int i = 0; i < byteVector.getShort(); i++) {
-            String elementName = ((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral();
-            ElementValue elementValue = visitElementValue(constantPool, byteVector);
-            newAnnotationInfo.addPair(elementName, elementValue);
-        }
-        return newAnnotationInfo;
-    }
-
-    static ElementValue visitElementValue(ConstantPool constantPool, ByteVector byteVector) {
-        byte tag = byteVector.getByte();
-        switch (tag) {
-            case 'B':
-            case 'C':
-            case 'I':
-            case 'S':
-            case 'Z':
-            case 'D':
-            case 'F':
-            case 'J':
-            case 's':
-                return new ConstElementValue(tag, (LiteralConstantPoolInfo) constantPool.get(byteVector.getShort()));
-            case 'e':
-                return new EnumElementValue(((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral(),
-                        ((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral()
-                );
-            case 'c':
-                return new ClassElementValue(((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral());
-            case '@':
-                return new AnnotationElementValue(visitAnnotation(constantPool, byteVector));
-            case '[':
-                short valueCount = byteVector.getShort();
-                ElementValue[] elementValues = new ElementValue[valueCount];
-                for (int i = 0; i < valueCount; i++) {
-                    elementValues[i] = visitElementValue(constantPool, byteVector);
-                }
-                return new ArrayElementValue(elementValues);
-            default:
-                throw new RuntimeException("error tag");
-        }
     }
 
     public AnnotationInfo setElement(@NotNull String elementName, byte constValue) {
@@ -257,9 +229,55 @@ public class AnnotationInfo {
         return annotationTypeIndex;
     }
 
+    static AnnotationInfo visitAnnotation(ConstantPool constantPool, ByteVector byteVector) {
+        AnnotationInfo newAnnotationInfo = new AnnotationInfo(constantPool.getUtf8(byteVector.getShort()));
+        short count = byteVector.getShort();
+        String elementName;
+        for (int i = 0; i < count; i++) {
+            elementName = constantPool.getUtf8(byteVector.getShort());
+            ElementValue elementValue = visitElementValue(constantPool, byteVector);
+            newAnnotationInfo.addPair(elementName, elementValue);
+        }
+        return newAnnotationInfo;
+    }
+
+    static ElementValue visitElementValue(ConstantPool constantPool, ByteVector byteVector) {
+        byte tag = byteVector.getByte();
+        switch (tag) {
+            case 'B':
+            case 'C':
+            case 'I':
+            case 'S':
+            case 'Z':
+            case 'D':
+            case 'F':
+            case 'J':
+            case 's':
+                return new ConstElementValue(tag, (LiteralConstantPoolInfo) constantPool.get(byteVector.getShort()));
+            case 'e':
+                return new EnumElementValue(((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral(),
+                        ((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral()
+                );
+            case 'c':
+                return new ClassElementValue(((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral());
+            case '@':
+                return new AnnotationElementValue(visitAnnotation(constantPool, byteVector));
+            case '[':
+                short valueCount = byteVector.getShort();
+                ElementValue[] elementValues = new ElementValue[valueCount];
+                for (int i = 0; i < valueCount; i++) {
+                    elementValues[i] = visitElementValue(constantPool, byteVector);
+                }
+                return new ArrayElementValue(elementValues);
+            default:
+                throw new RuntimeException("error tag");
+        }
+    }
+
     public byte[] toByteArray() {
         ByteVectors byteVectors = new ByteVectors();
         byteVectors.putShort(annotationTypeIndex);
+        byteVectors.putShort(elementValuePairsCount);
         pairs.values().forEach(elementValuePairs -> byteVectors.putArray(elementValuePairs.toByteArray()));
         return byteVectors.toByteArray();
     }
@@ -271,9 +289,21 @@ public class AnnotationInfo {
                 .sum() + 2;
     }
 
+    /**
+     * 参数信息
+     */
     class ElementValuePairs {
+        /**
+         * 参数名
+         */
         private final String elementName;
+        /**
+         * 参数值{@link ElementValue}
+         */
         private final ElementValue elementValue;
+        /**
+         * 参数名在常量池中的索引{@link ConstantPoolUtf8Info}
+         */
         private short elementNameIndex;
 
         public ElementValuePairs(String elementName, ElementValue elementValue) {
@@ -293,6 +323,7 @@ public class AnnotationInfo {
                     .putArray(elementValue.toByteArray())
                     .toByteArray();
         }
+
 
         public ElementValue getElementValue() {
             return elementValue;

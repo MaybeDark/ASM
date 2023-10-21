@@ -12,10 +12,10 @@ import java.util.ArrayList;
 
 public abstract class Annotations extends VariableLengthAttribute {
     protected int annotationCount = 0;
-    private ArrayList<AnnotationInfo> annotationInfos;
+    protected ArrayList<AnnotationInfo> annotationInfos;
 
     public Annotations(String attributeName) {
-        super((byte) (Target.class_info | Target.method_info | Target.field_info));
+        super((byte) (Target.class_info | Target.method_info | Target.field_info | Target.code_info));
         annotationInfos = new ArrayList<>();
         this.attributeName = attributeName;
     }
@@ -30,7 +30,8 @@ public abstract class Annotations extends VariableLengthAttribute {
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         byteVector.skip(4);
-        for (int i = 0; i < byteVector.getShort(); i++) {
+        short count = byteVector.getShort();
+        for (int i = 0; i < count; i++) {
             addAnnotationInfo(AnnotationInfo.visitAnnotation(constantPool, byteVector));
         }
         return this;

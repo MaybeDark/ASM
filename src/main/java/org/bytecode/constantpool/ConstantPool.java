@@ -5,15 +5,16 @@ import org.bytecode.constantpool.info.*;
 import org.exception.NotNullException;
 import org.tools.ArrayTool;
 import org.tools.ByteVector;
+import org.tools.ByteVectors;
 import org.tools.ConvertTool;
+import org.visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("all")
-public class ConstantPool extends AbsConstantPool{
+public class ConstantPool extends AbsConstantPool implements Visitor<ConstantPool> {
     private final ArrayList<AbsConstantPoolInfo> pool = new ArrayList<>();
     private final Map<Integer, Short> hash2Index = new HashMap<>();
 
@@ -153,35 +154,138 @@ public class ConstantPool extends AbsConstantPool{
         return constantPoolCount++;
     }
 
+    private short putInfo(AbsConstantPoolInfo info, boolean unique) {
+        if (unique) return putInfo(info);
+        hash2Index.putIfAbsent(info.hashCode(), constantPoolCount);
+        pool.add(info);
+        return constantPoolCount++;
+    }
+
+
     @Override
     public AbsConstantPoolInfo get(int index) {
         if (index == 0 || index >= constantPoolCount) {
-            throw new RuntimeException("ConstanlPool index must be greater than 0 and less than constantPoolCount");
+            throw new RuntimeException("ConstantPool index must be greater than 0 and less than constantPoolCount," + "index: " + index);
         }
         return pool.get(index - 1);
     }
 
+    public String getUtf8(int index) {
+        AbsConstantPoolInfo absConstantPoolInfo = get(index);
+        if (! (absConstantPoolInfo instanceof ConstantPoolUtf8Info))
+            throw new RuntimeException("constantPool[index] not a utf8_info");
+        return ((ConstantPoolUtf8Info) absConstantPoolInfo).getLiteral();
+    }
+
+    public String getUtf8OfClassInfo(int index) {
+        AbsConstantPoolInfo absConstantPoolInfo = get(index);
+        if (! (absConstantPoolInfo instanceof ConstantPoolClassInfo))
+            throw new RuntimeException("constantPool[index] not a class_info");
+        return getUtf8(ConvertTool.B2S(absConstantPoolInfo.getValue()));
+    }
+
+
     @Override
     public byte[] toByteArray() {
-        int size = 0;
-        size += 2; //length mark;
+        ByteVectors byteVectors = new ByteVectors();
+        byteVectors.putShort(constantPoolCount);
         for (int i = 0; i < constantPoolCount - 1; i++) {
-            size += pool.get(i).getLength();
+            byteVectors.putArray(pool.get(i).toByteArray());
         }
-        ByteVector result = new ByteVector(size);
-        result.putShort(constantPoolCount);
-        for (int i = 0; i < constantPoolCount - 1; i++) {
-            result.putArray(pool.get(i).toByteArray());
-        }
-        return result.end();
+//        int size = 0;
+//        size += 2; //length mark;
+//        for (int i = 0; i < constantPoolCount - 1; i++) {
+//            size += pool.get(i).getLength();
+//        }
+//        ByteVector result = new ByteVector(size);
+//        result.putShort(constantPoolCount);
+//        for (int i = 0; i < constantPoolCount - 1; i++) {
+//            result.putArray(pool.get(i).toByteArray());
+//        }
+        return byteVectors.toByteArray();
     }
+
+    @Override
+    public ConstantPool visit(ConstantPool constantPool, ByteVector byteVector) {
+        int count = byteVector.getShort();
+        for (int i = 0; i < count - 1; i++) {
+            resole(byteVector);
+        }
+        return this;
+    }
+
+    public ConstantPool visit(ConstantPool constantPool, ByteVector byteVector, boolean complete) {
+        visit(constantPool, byteVector);
+        if (complete) {
+            complete();
+        }
+        return this;
+    }
+
+    public void complete() {
+        for (AbsConstantPoolInfo info : pool) {
+            if (info instanceof SymbolicReferenceConstantPoolInfo) {
+                ((SymbolicReferenceConstantPoolInfo) info).ldc(this);
+            }
+        }
+    }
+
+    private void resole(ByteVector byteVector) {
+        byte tag = byteVector.getByte();
+        switch (tag) {
+            case 1:
+                putInfo(new ConstantPoolUtf8Info(new String(byteVector.getArray(byteVector.getShort()))), false);
+                break;
+            case 3:
+                putInfo(new ConstantPoolIntegerInfo(byteVector.getInt()), false);
+                break;
+            case 4:
+                putInfo(new ConstantPoolFloatInfo(ConvertTool.B2F(byteVector.getArray(4))), false);
+                break;
+            case 5:
+                putInfo(new ConstantPoolLongInfo(byteVector.getLong()), false);
+                break;
+            case 6:
+                putInfo(new ConstantPoolDoubleInfo(ConvertTool.B2D(byteVector.getArray(8))), false);
+                break;
+            case 7:
+                putInfo(new ConstantPoolClassInfo(byteVector.getArray(2)), false);
+                break;
+            case 8:
+                putInfo(new ConstantPoolStringInfo(byteVector.getArray(2)), false);
+                break;
+            case 9:
+                putInfo(new ConstantPoolFieldrefInfo(byteVector.getArray(4)), false);
+                break;
+            case 10:
+                putInfo(new ConstantPoolMethodrefInfo(byteVector.getArray(4)), false);
+                break;
+            case 11:
+                putInfo(new ConstantPoolInterfaceMethodrefInfo(byteVector.getArray(4)), false);
+                break;
+            case 12:
+                putInfo(new ConstantPoolNameAndTypeInfo(byteVector.getArray(4)), false);
+                break;
+            case 15:
+                putInfo(new ConstantPoolMethodHandleInfo(byteVector.getByte(), byteVector.getArray(2)), false);
+                break;
+            case 16:
+                putInfo(new ConstantPoolMethodTypeInfo(byteVector.getArray(2)), false);
+                break;
+            case 18:
+                putInfo(new ConstantPoolInvokeDynamicInfo(byteVector.getArray(4)), false);
+                break;
+            default:
+                throw new RuntimeException("error byteArray of constantPool");
+        }
+    }
+
 
     public short resolveConstantPoolInfo(@NotNull AbsConstantPoolInfo scpi) {
         if (Objects.isNull(scpi)) {
             throw new NotNullException("args0 must be not null");
         }
-        short infoIndex = 0;
-        infoIndex = scpi.load(this);
+//        short infoIndex;
 //        switch (scpi.getTag()) {
 //            case CONSTANT_InterfaceMethodref_info:
 //                ConstantPoolInterfaceMethodrefInfo cpimr = (ConstantPoolInterfaceMethodrefInfo) scpi;
@@ -238,7 +342,7 @@ public class ConstantPool extends AbsConstantPool{
 //                infoIndex = putStringInfo(cpsi.getLiteral());
 //                break;
 //        }
-        return infoIndex;
+        return scpi.load(this);
     }
 
 //    public byte[] resolveBootstrapMethod(BootstrapMethod bm) {
@@ -270,7 +374,7 @@ public class ConstantPool extends AbsConstantPool{
 
     public String print() {
         StringBuilder sb = new StringBuilder();
-        sb.append("count : " + constantPoolCount);
+        sb.append("count : ").append(constantPoolCount).append("\n");
         for (int i = 0; i < constantPoolCount - 1; i++) {
             AbsConstantPoolInfo absConstantPoolInfo = pool.get(i);
             sb.append(String.format("[%02d]", i + 1));

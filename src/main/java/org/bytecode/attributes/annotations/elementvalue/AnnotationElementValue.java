@@ -4,7 +4,14 @@ import org.bytecode.attributes.annotations.AnnotationInfo;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVectors;
 
+/**
+ * 参数类型为注解类型
+ * Annotation{
+ * Annotation value();
+ * }
+ */
 public class AnnotationElementValue extends ElementValue {
+
     private AnnotationInfo annotationInfo;
 
     public AnnotationElementValue(AnnotationInfo annotationInfo) {

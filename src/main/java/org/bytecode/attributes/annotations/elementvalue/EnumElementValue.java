@@ -3,7 +3,17 @@ package org.bytecode.attributes.annotations.elementvalue;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVector;
 
+/**
+ * 参数类型为枚举类型
+ * Annotation{
+ * Enum value();
+ * }
+ */
 public class EnumElementValue extends ElementValue {
+    /**
+     * enumName 枚举类名
+     * constName 枚举名
+     */
     private String enumName, constName;
     private short enumNameIndex = 0, constNameIndex = 0;
 

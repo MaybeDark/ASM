@@ -4,8 +4,6 @@ import org.bytecode.attributes.Attribute;
 import org.bytecode.attributes.Target;
 import org.bytecode.attributes.VariableLengthAttribute;
 import org.bytecode.constantpool.ConstantPool;
-import org.bytecode.constantpool.info.ConstantPoolClassInfo;
-import org.bytecode.constantpool.info.ConstantPoolUtf8Info;
 import org.tools.ByteVector;
 
 import java.util.HashMap;
@@ -18,7 +16,7 @@ public class InnerClasses extends VariableLengthAttribute {
     public InnerClasses() {
         super(Target.class_info);
         attributeLength = 2;
-        attributeName = "InnerClass";
+        attributeName = "InnerClasses";
         pool = new HashMap<>();
     }
 
@@ -46,16 +44,19 @@ public class InnerClasses extends VariableLengthAttribute {
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         byteVector.skip(4);
-        for (int i = 0; i < byteVector.getShort(); i++) {
-            ConstantPoolClassInfo innerClassInfo = (ConstantPoolClassInfo) constantPool.get(byteVector.getShort());
-            short outerClassInfoIndex = byteVector.getShort();
-            String outerClassName = null;
-            if (outerClassInfoIndex != 0) {
-                outerClassName = ((ConstantPoolClassInfo) constantPool.get(outerClassInfoIndex)).getClassInfo();
+        short count = byteVector.getShort(), outerClassInfoIndex, innerNameIndex, access;
+        InnerClass newInnerClass;
+        String outerClassName = null, innerName = null, innerClassName;
+        for (int i = 0; i < count; i++) {
+            innerClassName = constantPool.getUtf8OfClassInfo(byteVector.getShort());
+            if ((outerClassInfoIndex = byteVector.getShort()) != 0) {
+                outerClassName = constantPool.getUtf8OfClassInfo(outerClassInfoIndex);
             }
-            ConstantPoolUtf8Info innerNameInfo = (ConstantPoolUtf8Info) constantPool.get(byteVector.getShort());
-            short access = byteVector.getShort();
-            InnerClass newInnerClass = new InnerClass(access, innerClassInfo.getClassInfo(), outerClassName, innerNameInfo.getLiteral());
+            if ((innerNameIndex = byteVector.getShort()) != 0) {
+                innerName = constantPool.getUtf8(innerNameIndex);
+            }
+            access = byteVector.getShort();
+            newInnerClass = new InnerClass(access, innerClassName, outerClassName, innerName);
             addInnerClass(newInnerClass);
         }
         return this;

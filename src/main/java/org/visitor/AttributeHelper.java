@@ -76,6 +76,7 @@ public class AttributeHelper implements Visitor<Attribute> {
             Attribute attribute = attributeClass.getConstructor().newInstance();
             return attribute.visit(constantPool, byteVector);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Unknown error occurred in attribute visit");
         }
     }

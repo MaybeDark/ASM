@@ -1,13 +1,18 @@
 package TestPackage;
 
 
-import org.bytecode.attributes.code.instruction.InstructionSet;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
+
+@Nullable
 public class Test4 {
-    int a = 0;
-    int b = a;
-    public static void main(String[] args){
-        System.out.println(InstructionSet.LXOR.getOpcode());
+    List<@Nullable String> list;
+
+    public static void main(String[] args) {
+
+//        System.out.println(InstructionSet.LXOR.getOpcode());
 //        {
 //            long d = 8L;
 //            long e = 9L;
@@ -370,6 +375,11 @@ public class Test4 {
 //        System.out.println(InstructionSet.GETFIELD.getOpcode());
 //        System.out.println(InstructionSet.PUTFIELD.getOpcode());
 
+    }
+
+    @Nullable void method(@Nullable int arg0, int arg1, @Nullable int arg2) {
+        @Nullable
+        String a = "2";
     }
 
 //   static String getString(int num){

@@ -31,7 +31,7 @@ public class SourceFile extends FixedLengthAttribute {
 
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
-        sourceCpIndex = byteVector.getShort();
+        byteVector.skip(4);
         sourceFile = ((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral();
         return this;
     }

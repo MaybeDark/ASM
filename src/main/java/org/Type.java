@@ -112,13 +112,13 @@ public final class Type {
         sb.append('(');
         if (ArrayTool.notNull(argumentTypes)) {
             for (Type argumentType : argumentTypes) {
-                if (argumentType == null || argumentType.equals(Type.VOID))
+                if (argumentType == null || argumentType.isVoidType())
                     break;
                 sb.append(argumentType.desc);
             }
         }
         sb.append(')');
-        if (returnType == null || returnType.equals(Type.VOID)) {
+        if (returnType == null || returnType.isVoidType()) {
             sb.append('V');
         } else {
             sb.append(returnType.desc);

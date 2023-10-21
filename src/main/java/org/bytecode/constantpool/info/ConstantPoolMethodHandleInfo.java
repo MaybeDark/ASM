@@ -8,10 +8,10 @@ import org.tools.ArrayTool;
 import org.tools.ConvertTool;
 
 public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolInfo implements Parameterizable {
-    private final byte type;
-    private final String classInfo;
+    private byte type;
+    private String classInfo;
     private String name;
-    private final String desc;
+    private String desc;
 
     public ConstantPoolMethodHandleInfo(byte type, String classInfo, String name, String desc, byte[] ref) {
         super(ConstantPoolTag.CONSTANT_MethodHandle_info);
@@ -21,6 +21,12 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
         this.desc = desc;
         if (ref != null)
             setValue(ArrayTool.join(type, ref));
+    }
+
+    public ConstantPoolMethodHandleInfo(byte type, byte[] ref) {
+        super(ConstantPoolTag.CONSTANT_MethodHandle_info);
+        this.type = type;
+        setValue(ArrayTool.join(type, ref));
     }
 
     public ConstantPoolMethodHandleInfo(byte type, String classInfo, String name, String desc) {
@@ -37,6 +43,19 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
 
     public ReferenceKind getKind() {
         return ReferenceKind.get(type);
+    }
+
+    @Override
+    public void ldc(ConstantPool constantPool) {
+        AbsConstantPoolInfo info = constantPool.get(ConvertTool.B2S(value[1], value[2]));
+        byte[] value = info.getValue();
+        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(ConvertTool.B2S(value[1], value[2]));
+        classInfo.ldc(constantPool);
+        this.classInfo = classInfo.getClassInfo();
+        ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(value[3], value[4]));
+        nameAndTypeInfo.ldc(constantPool);
+        this.name = nameAndTypeInfo.getName();
+        this.desc = nameAndTypeInfo.getDesc();
     }
 
     @Override
@@ -58,6 +77,14 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setClassInfo(String classInfo) {
+        this.classInfo = classInfo;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     @Override

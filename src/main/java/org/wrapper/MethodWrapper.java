@@ -2,22 +2,23 @@ package org.wrapper;
 
 import com.sun.istack.internal.Nullable;
 import org.Type;
-import org.bytecode.Specification;
 import org.bytecode.constantpool.ConstantPool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
-public class MethodWrapper{
+import static org.bytecode.method.ConstructorWriter.CONSTRUCTOR_METHODNAME;
+
+public class MethodWrapper {
 
     private final String className;
     private final String methodName;
     private String methodDesc;
     private Type returnType;
     private Type[] parameterTypes;
-    private int    parameterCount;
-    private int    pop;
+    private int parameterCount;
+    private int pop;
     private int    put;
     private boolean loaded = false;
     private short  methodInfoIndex;
@@ -34,7 +35,7 @@ public class MethodWrapper{
 //        }
 //        this.parameterTypes = Type.getType(method.getParameterTypes());
         this(Type.getType(method.getDeclaringClass()).getClassInfo(),
-                method instanceof Constructor ? Specification.CONSTRUCTOR_METHODNAME : method.getName(),
+                method instanceof Constructor ? CONSTRUCTOR_METHODNAME : method.getName(),
                 method instanceof Constructor ? null : Type.getType(((Method) method).getReturnType()),
                 Type.getType(method.getParameterTypes())
         );

@@ -1,7 +1,5 @@
 package org.tools;
 
-import com.sun.glass.ui.Size;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,20 +72,24 @@ public class ByteVectors{
         length += index;
         int length = bytes.length - index;
         byte[] remain = new byte[length];
-        System.arraycopy(bytes, 4 * i,remain,0,length);
+        System.arraycopy(bytes, 4 * i, remain, 0, length);
         return remain;
     }
 
-    public void enlarge(){
+    public void enlarge() {
         writePoint = new ByteVector(SIZE);
         context.add(writePoint);
         writeLength = 0;
     }
 
+    public int getLength() {
+        return length;
+    }
+
     public byte[] toByteArray() {
         Iterator<ByteVector> iterator = context.iterator();
         ByteVector all = new ByteVector(length);
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             byte[] part = iterator.next().end();
             all.putArray(part);
         }

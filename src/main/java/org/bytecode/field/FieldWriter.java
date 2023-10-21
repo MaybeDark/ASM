@@ -85,10 +85,11 @@ public class FieldWriter implements ByteCodeWriter {
         return type;
     }
 
+
     public byte[] toByteArray() {
         ConstantPool constantPool = classWriter.getConstantPool();
-        short typeCpIndex = constantPool.putUtf8Info(type.getDescriptor());
         short nameCpIndex = constantPool.putUtf8Info(name);
+        short typeCpIndex = constantPool.putUtf8Info(type.getDescriptor());
         byte[] attributeByteArray = new byte[0];
         short attributeCount = 0;
         for (Attribute attribute : attributes.values()) {
@@ -100,8 +101,8 @@ public class FieldWriter implements ByteCodeWriter {
         }
         ByteVector result = new ByteVector(8 + attributeByteArray.length);
         result.putShort(access)
-                .putShort(typeCpIndex)
                 .putShort(nameCpIndex)
+                .putShort(typeCpIndex)
                 .putShort(attributeCount)
                 .putArray(attributeByteArray);
         return result.end();

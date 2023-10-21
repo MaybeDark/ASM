@@ -7,7 +7,7 @@ public interface Target {
     byte code_info = 8;
 
     static boolean check(byte target, byte check) {
-        return (target & check) == check;
+        return (target & check) != 0;
     }
 
 }

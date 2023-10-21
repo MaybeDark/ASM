@@ -3,6 +3,10 @@ package org.bytecode.constantpool.info;
 
 import org.bytecode.constantpool.ConstantPoolTag;
 
+/**
+ * @author 12923
+ * @date 2023/10/21
+ */
 public abstract class LiteralConstantPoolInfo<T> extends AbsConstantPoolInfo{
 
     protected T literal;

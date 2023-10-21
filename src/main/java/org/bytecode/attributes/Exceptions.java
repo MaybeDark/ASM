@@ -51,7 +51,8 @@ public class Exceptions extends VariableLengthAttribute {
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         byteVector.skip(4);
-        for (int i = 0; i < byteVector.getShort(); i++) {
+        short count = byteVector.getShort();
+        for (int i = 0; i < count; i++) {
             addException(((ConstantPoolClassInfo) constantPool.get(byteVector.getShort())).getClassInfo());
         }
         return this;

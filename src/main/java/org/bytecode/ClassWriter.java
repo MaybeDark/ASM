@@ -25,16 +25,20 @@ public class ClassWriter implements ByteCodeWriter {
     public ClassWrapper superClass;
     public ClassWrapper thisClass;
     protected int access;
-    protected ConstantPool constantPool;
-    protected Map<String, FieldWriter> fields;
+    protected ConstantPool constantPool = new ConstantPool();
+    protected Map<String, FieldWriter> fields = new HashMap<>();
     protected int fieldCount = 0;
-    protected ArrayList<MethodWriter> methods;
-    protected Map<String, Map<String, Integer>> name2Methods;
+    protected ArrayList<MethodWriter> methods = new ArrayList<>();
+    protected Map<String, Map<String, Integer>> name2Methods = new HashMap<>();
     protected int methodCount = 0;
-    protected Map<String, Attribute> attributes;
+    protected Map<String, Attribute> attributes = new HashMap<>();
     protected int attributeCount = 0;
-    protected Map<Short, ClassWrapper> interfaces;
+    protected Map<Short, ClassWrapper> interfaces = new HashMap<>();
     protected int interfaceCount = 0;
+
+    {
+        CodeHelper.getHelper().setConstantPool(constantPool);
+    }
 
     public ClassWriter(int access, String classInfo) {
         this(access, classInfo, Object.class);
@@ -43,6 +47,7 @@ public class ClassWriter implements ByteCodeWriter {
     public ClassWriter(int access, String classInfo, Class<?> superClass) {
         this(access, classInfo, superClass, (Class<?>) null);
     }
+
 
     /**
      * @param access     权限修饰符
@@ -54,12 +59,6 @@ public class ClassWriter implements ByteCodeWriter {
         this.access = access;
         this.thisClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo)));
         this.superClass = new ClassWrapper(superClass);
-        this.constantPool = new ConstantPool();
-        this.fields = new HashMap<>();
-        this.methods = new ArrayList<>();
-        this.name2Methods = new HashMap<>();
-        this.attributes = new HashMap<>();
-        this.interfaces = new HashMap<>();
         this.thisClass.load(constantPool);
         this.superClass.load(constantPool);
         if (ArrayTool.notNull(interfaces))
@@ -67,7 +66,7 @@ public class ClassWriter implements ByteCodeWriter {
                 if (anInterface != null)
                     addInterfaces(anInterface);
             }
-        CodeHelper.getHelper().setConstantPool(constantPool);
+
     }
 
     protected ClassWriter() {
@@ -87,12 +86,19 @@ public class ClassWriter implements ByteCodeWriter {
         Type type = Type.getType(Type.getClassDescriptor(interfaceName));
         ClassWrapper wrapper = new ClassWrapper(type);
         interfaces.put(wrapper.load(constantPool), wrapper);
+        interfaceCount++;
         return this;
     }
 
 
     public MethodWriter addMethod(int access, String methodName, Type returnType, LocalVariableWrapper... parameters) {
         MethodWriter methodWriter = new MethodWriter(this, access, methodName, returnType, parameters);
+        addMethod0(methodWriter);
+        return methodWriter;
+    }
+
+    protected MethodWriter addMethod(int access, String methodName, String methodDesc) {
+        MethodWriter methodWriter = new MethodWriter(this, access, methodName, methodDesc);
         addMethod0(methodWriter);
         return methodWriter;
     }
@@ -123,8 +129,8 @@ public class ClassWriter implements ByteCodeWriter {
     }
 
     public ClassWriter addAttribute(Attribute attribute) {
-        if (Target.check(attribute.target, Target.class_info))
-            throw new RuntimeException(attribute.getAttributeName() + "not a class attribute");
+        if (! Target.check(attribute.target, Target.class_info))
+            throw new RuntimeException(attribute.getAttributeName() + " not a class attribute");
         attributes.put(attribute.getAttributeName(), attribute);
         attributeCount++;
         return this;
@@ -146,7 +152,9 @@ public class ClassWriter implements ByteCodeWriter {
         this.thisClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(name)));
     }
 
-    private void load(){
+    private void load() {
+        thisClass.load(constantPool);
+        superClass.load(constantPool);
         for (Attribute attribute : attributes.values()) {
             if (attribute != null) {
                 attribute.load(constantPool);
@@ -168,14 +176,18 @@ public class ClassWriter implements ByteCodeWriter {
     }
 
     private void creatDefaultConstructor(){
-//        addConstructor(ACC_PUBLIC,new MethodWrapper());
+        addMethod0(ConstructorWriter.getNoArgsConstructor(this));
     }
 
-    public byte[] toByteArray(){
+    public byte[] toByteArray() {
         load();
-        if (getMethodsByName("<init>") == null){
+        if (getMethodsByName("<init>") == null) {
             creatDefaultConstructor();
         }
+        ByteVectors fieldByteArray = new ByteVectors();
+        fields.forEach((index, field) -> fieldByteArray.putArray(field.toByteArray()));
+        ByteVectors methodByteArray = new ByteVectors();
+        methods.forEach((method) -> methodByteArray.putArray(method.toByteArray()));
         ByteVectors classByteArray = new ByteVectors();
         classByteArray.putArray(CLASSFILEHEADER)
                 .putInt(V1_8)
@@ -186,45 +198,12 @@ public class ClassWriter implements ByteCodeWriter {
                 .putShort(interfaceCount);
         interfaces.forEach((index, classWrapper) -> classByteArray.putShort(index));
         classByteArray.putShort(fieldCount);
-        fields.forEach((index, field) -> classByteArray.putArray(field.toByteArray()));
+        classByteArray.putArray(fieldByteArray.toByteArray());
         classByteArray.putShort(methodCount);
-        methods.forEach((method) -> classByteArray.putArray(method.toByteArray()));
+        classByteArray.putArray(methodByteArray.toByteArray());
         classByteArray.putShort(attributeCount);
         attributes.forEach((index, attribute) -> classByteArray.putArray(attribute.toByteArray()));
         return classByteArray.toByteArray();
-//        ByteVector part1 = new ByteVector(8)
-//                .putArray(CLASSFILEHEADER)
-//                .putInt(V1_8);
-//        byte[] part2 = constantPool.toByteArray();
-//        ByteVector part3 = new ByteVector(8 + interfaceCount * 2)
-//                .putShort(access)
-//                .putShort(thisClass.getCpIndex())
-//                .putShort(superClass.getCpIndex())
-//                .putShort(interfaceCount);
-//        interfaces.forEach(((index, classWrapper) -> {
-//            part3.putShort(index);
-//        }));
-//
-//        fields.forEach((name,field)->{
-//
-//        });
-//        byte[] part4 = fields.toByteArray();
-//        byte[] part5 = methods.toByteArray();
-//        byte[] part6 = ConvertTool.S2B(attributeCount);
-//        for (Attribute attribute : attributes.values()) {
-//            if (attribute != null){
-//                part6 = ArrayTool.join(part6,attribute.toByteArray());
-//            }
-//        }
-//        int fileLength = part1.length + part2.length + part3.getLength() + part4.length + part5.length + part6.length;
-//        ByteVector result = new ByteVector(fileLength);
-//        result.putArray(part1)
-//                .putArray(part2)
-//                .putArray(part3.end())
-//                .putArray(part4)
-//                .putArray(part5)
-//                .putArray(part6);
-//        return result.end();
     }
 
     public ConstantPool getConstantPool() {

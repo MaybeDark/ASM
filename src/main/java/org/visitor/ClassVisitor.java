@@ -1,10 +1,15 @@
 package org.visitor;
 
-import org.Access;
+import org.Type;
 import org.bytecode.ClassWriter;
+import org.bytecode.attributes.code.Code;
+import org.bytecode.constantpool.info.ConstantPoolClassInfo;
+import org.bytecode.constantpool.info.ConstantPoolUtf8Info;
+import org.bytecode.field.FieldWriter;
+import org.bytecode.method.MethodWriter;
 import org.exception.NoSupportException;
 import org.tools.ByteVector;
-import org.wrapper.BytecodeWrapper;
+import org.wrapper.ClassWrapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,10 +19,9 @@ import java.util.Arrays;
 
 public class ClassVisitor extends ClassWriter {
     ByteVector byteCode;
-    ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor();
-
+    AttributeHelper attributeHelper = AttributeHelper.getHelper();
     {
-        AttributeHelper.getHelper().setConstantPool(constantPool);
+        attributeHelper.setConstantPool(constantPool);
     }
 
     public ClassVisitor(byte[] byteCode) {
@@ -36,57 +40,64 @@ public class ClassVisitor extends ClassWriter {
         }
     }
 
-//    public ClassVisitor visit(){
-//        checkHeader(byteCode.getArray(4));
-//        checkVersion(byteCode.getInt());
-//        constantPool = constantPoolVisitor.visit(byteCode);
-//        access = byteCode.getShort();
-//        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
-//        this.thisClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo.getClassInfo())));
-//        classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
-//        this.superClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo.getClassInfo())));
-//        //interfaceCount
-//        for (int i = 0; i < byteCode.getShort(); i++) {
-//            classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
-//            addInterfaces(classInfo.getClassInfo()) ;
-//        }
-//
-//        //fieldCount
-//        for (int i = 0; i < byteCode.getShort(); i++) {
-//            int access = byteCode.getShort();
-//            ConstantPoolUtf8Info fieldName = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-//            ConstantPoolUtf8Info fieldType = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-//            addField(access, fieldName.literalToString(), Type.getType(fieldType.literalToString()));
-//            //attributeCount
-//            for (int j = 0; j < byteCode.getShort(); j++) {
-//                ConstantPoolUtf8Info attributeName = (ConstantPoolUtf8Info)constantPool.get(byteCode.getShort());
-//
-//            }
-//        }
-//
-//        //methodCount
-//        for (int i = 0; i < byteCode.getShort(); i++) {
-//            int access = byteCode.getShort();
-//            ConstantPoolUtf8Info methodName = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-//            ConstantPoolUtf8Info methodDesc = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-//            Type returnType = Type.getReturnType(methodDesc.literalToString());
-//            Type[] argumentTypes = Type.getArgumentTypes(methodDesc.literalToString());
-//            addMethod(access,methodName,returnType,)
-//        }
-//
-//    }
-
-    public BytecodeWrapper easyVisit() {
-        BytecodeWrapper wrapper = new BytecodeWrapper();
+    public ClassVisitor visit() {
         checkHeader(byteCode.getArray(4));
-        wrapper.version = byteCode.getInt();
-        wrapper.constantPoolCount = constantPoolVisitor.getConstantPoolCount();
-        constantPool = constantPoolVisitor.visit(byteCode);
-        wrapper.constantPoolDescribe = constantPool.print();
-        wrapper.classAccess = Access.parseClassAccess(byteCode.getShort());
+        checkVersion(byteCode.getInt());
+        constantPool.visit(constantPool, byteCode, true);
+        access = byteCode.getShort();
+        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
+        this.thisClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo.getClassInfo())));
+        classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
+        this.superClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo.getClassInfo())));
+        short interfaceCount = byteCode.getShort();
+        for (int i = 0; i < interfaceCount; i++) {
+            classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
+            addInterfaces(classInfo.getClassInfo());
+        }
 
-        return wrapper;
+        //fieldCount
+        short fieldCount = byteCode.getShort();
+        for (int i = 0; i < fieldCount; i++) {
+            int access = byteCode.getShort();
+            FieldWriter fieldWriter = addField(access, constantPool.getUtf8(byteCode.getShort()), Type.getType(constantPool.getUtf8(byteCode.getShort())));
+            //attributeCount
+            short count = byteCode.getShort();
+            for (int j = 0; j < count; j++) {
+                fieldWriter.addAttribute(attributeHelper.visit(constantPool, byteCode));
+            }
+        }
+
+        //methodCount
+        short methodCount = byteCode.getShort();
+        for (int i = 0; i < methodCount; i++) {
+            int access = byteCode.getShort();
+            ConstantPoolUtf8Info methodName = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
+            ConstantPoolUtf8Info methodDesc = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
+            MethodWriter methodWriter = addMethod(access, methodName.getLiteral(), methodDesc.getLiteral());
+            short attrCount = byteCode.getShort();
+            for (int j = 0; j < attrCount; j++) {
+                methodWriter.addAttribute(attributeHelper.visit(constantPool, byteCode));
+            }
+            methodWriter.setCode((Code) methodWriter.getAttribute("Code"));
+        }
+        short attrCount = byteCode.getShort();
+        for (int i = 0; i < attrCount; i++) {
+            addAttribute(attributeHelper.visit(constantPool, byteCode));
+        }
+        return this;
     }
+
+//    public BytecodeWrapper easyVisit() {
+//        BytecodeWrapper wrapper = new BytecodeWrapper();
+//        checkHeader(byteCode.getArray(4));
+//        wrapper.version = byteCode.getInt();
+//        wrapper.constantPoolCount = constantPoolVisitor.getConstantPoolCount();
+//        constantPool = constantPoolVisitor.visit(byteCode);
+//        wrapper.constantPoolDescribe = constantPool.print();
+//        wrapper.classAccess = Access.parseClassAccess(byteCode.getShort());
+//
+//        return wrapper;
+//    }
 
 
     private void checkVersion(int version) {

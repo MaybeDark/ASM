@@ -11,21 +11,37 @@ public class FullFrame implements StackMapFrame {
     private final short numberOfStack;
     private final VariableInfo[] stackTypeInfo;
     private int length;
-    public FullFrame(short offsetDelta, short numberOfLocals, VariableInfo[] localTypeInfo, short numberOfStack, VariableInfo[] stackTypeInfo) {
+
+    public FullFrame(short offsetDelta, VariableInfo[] localTypeInfo, VariableInfo[] stackTypeInfo) {
         this.offsetDelta = offsetDelta;
-        this.numberOfLocals = numberOfLocals;
+        this.numberOfLocals = (short) localTypeInfo.length;
         this.localTypeInfo = localTypeInfo;
-        this.numberOfStack = numberOfStack;
+        this.numberOfStack = (short) stackTypeInfo.length;
         this.stackTypeInfo = stackTypeInfo;
         length = 5;
         for (VariableInfo variableInfo : localTypeInfo) {
             length += variableInfo.getLength();
         }
-
         for (VariableInfo variableInfo : stackTypeInfo) {
             length += variableInfo.getLength();
         }
     }
+
+//    public FullFrame(short offsetDelta, short numberOfLocals, VariableInfo[] localTypeInfo, short numberOfStack, VariableInfo[] stackTypeInfo) {
+//        this.offsetDelta = offsetDelta;
+//        this.numberOfLocals = numberOfLocals;
+//        this.localTypeInfo = localTypeInfo;
+//        this.numberOfStack = numberOfStack;
+//        this.stackTypeInfo = stackTypeInfo;
+//        length = 5;
+//        for (VariableInfo variableInfo : localTypeInfo) {
+//            length += variableInfo.getLength();
+//        }
+//
+//        for (VariableInfo variableInfo : stackTypeInfo) {
+//            length += variableInfo.getLength();
+//        }
+//    }
 
     @Override
     public byte[] toByteArray() {

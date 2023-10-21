@@ -2,13 +2,14 @@ package org.bytecode.constantpool.info;
 
 import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
+import org.tools.ConvertTool;
 
 @SuppressWarnings("all")
-public class ConstantPoolFieldrefInfo  extends SymbolicReferenceConstantPoolInfo{
+public class ConstantPoolFieldrefInfo extends SymbolicReferenceConstantPoolInfo {
 
-    private final String classInfo;
-    private final String fieldName;
-    private final String fieldDesc;
+    private String classInfo;
+    private String fieldName;
+    private String fieldDesc;
 
     public ConstantPoolFieldrefInfo(String classInfo, String fieldName, String fieldDesc, byte[] ref) {
         super(ConstantPoolTag.CONSTANT_Fieldref_info);
@@ -20,6 +21,23 @@ public class ConstantPoolFieldrefInfo  extends SymbolicReferenceConstantPoolInfo
 
     public ConstantPoolFieldrefInfo(String classInfo, String fieldName, String fieldType) {
         this(classInfo, fieldName, fieldType, null);
+    }
+
+    public ConstantPoolFieldrefInfo(byte[] ref) {
+        super(ConstantPoolTag.CONSTANT_Fieldref_info);
+        setValue(ref);
+    }
+
+    public void setClassInfo(String classInfo) {
+        this.classInfo = classInfo;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public void setFieldDesc(String fieldDesc) {
+        this.fieldDesc = fieldDesc;
     }
 
     public String getClassInfo() {
@@ -37,5 +55,21 @@ public class ConstantPoolFieldrefInfo  extends SymbolicReferenceConstantPoolInfo
     @Override
     public short load(ConstantPool constantPool) {
         return constantPool.putFieldrefInfo(classInfo, fieldName, fieldDesc);
+    }
+
+    @Override
+    public void ldc(ConstantPool constantPool) {
+        if (classInfo != null) {
+            return;
+        }
+        // 获取常量池中的类名
+        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(ConvertTool.B2S(this.value[0], this.value[1]));
+        classInfo.ldc(constantPool);
+        this.classInfo = classInfo.getClassInfo();
+        // 获取常量池中的字段名
+        ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(this.value[2], this.value[3]));
+        nameAndTypeInfo.ldc(constantPool);
+        fieldName = nameAndTypeInfo.getName();
+        fieldDesc = nameAndTypeInfo.getDesc();
     }
 }

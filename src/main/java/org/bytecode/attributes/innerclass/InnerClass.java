@@ -15,6 +15,7 @@ public class InnerClass {
     private short outerClassIndex = 0;
     private short innerNameIndex = 0;
     private boolean inClass = true;
+    private boolean isSynthetic;
 
     public InnerClass(short access, String innerClassName, String outerClassName, String innerName) {
         this.access = access;
@@ -22,6 +23,7 @@ public class InnerClass {
         if (Objects.isNull(outerClassName) || outerClassName.isEmpty()) {
             inClass = false;
         }
+        this.isSynthetic = Access.isSynthetic(access);
         this.outerClassName = outerClassName;
         this.innerName = innerName;
     }
@@ -45,7 +47,9 @@ public class InnerClass {
     }
 
     short load(ConstantPool cp) {
-        innerNameIndex = cp.putUtf8Info(innerName);
+        if (! isSynthetic) {
+            innerNameIndex = cp.putUtf8Info(innerName);
+        }
         innerClassIndex = cp.putClassInfo(innerClassName);
         if (inClass) {
             outerClassIndex = cp.putClassInfo(outerClassName);

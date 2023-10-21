@@ -3,6 +3,12 @@ package org.bytecode.attributes.annotations.elementvalue;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVector;
 
+/**
+ * 参数类型为{@link Class}
+ * Annotation{
+ * Class value();
+ * }
+ */
 public class ClassElementValue extends ElementValue {
     private String classInfo;
     private short classIndex = 0;
@@ -24,7 +30,10 @@ public class ClassElementValue extends ElementValue {
 
     @Override
     public byte[] toByteArray() {
-        return new ByteVector(3).putByte(tag).putShort(classIndex).end();
+        return new ByteVector(3)
+                .putByte(tag)
+                .putShort(classIndex)
+                .end();
     }
 
     @Override

@@ -231,7 +231,8 @@ public enum InstructionSet {
     }
 
     public static InstructionSet get(byte opcode) {
-        return InstructionSet.values()[opcode];
+        int uOpcode = opcode & 0xff;
+        return InstructionSet.values()[uOpcode];
     }
 
     public byte getOpcode() {

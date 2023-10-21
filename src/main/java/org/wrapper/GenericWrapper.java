@@ -14,6 +14,7 @@ public class GenericWrapper {
         this.genericName = genericName;
         this.extendsBy = extendsBy;
     }
+
     public GenericWrapper(String genericName){
         this.genericName = genericName;
         this.extendsBy = Type.getType(Object.class);

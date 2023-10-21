@@ -3,6 +3,13 @@ package org.bytecode.attributes.annotations.elementvalue;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVectors;
 
+/**
+ * 参数类型为数组类型
+ * 元素类型 {@link ElementValue}
+ * Annotation{
+ * ElementValue[] value();
+ * }
+ */
 public class ArrayElementValue extends ElementValue {
     private short valueCount;
     private ElementValue[] values;
@@ -23,7 +30,9 @@ public class ArrayElementValue extends ElementValue {
 
     @Override
     public byte[] toByteArray() {
-        ByteVectors byteVectors = new ByteVectors().putByte(tag).putShort(valueCount);
+        ByteVectors byteVectors = new ByteVectors()
+                .putByte(tag)
+                .putShort(valueCount);
         for (int i = 0; i < valueCount; i++) {
             byteVectors.putArray(values[i].toByteArray());
         }

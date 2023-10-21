@@ -87,9 +87,11 @@ public class BootstrapMethods extends Attribute {
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         BootstrapMethod newBootstrapMethod;
         byteVector.skip(4);
-        for (int i = 0; i < byteVector.getShort(); i++) {
+        short count = byteVector.getShort(), argCount;
+        for (int i = 0; i < count; i++) {
             newBootstrapMethod = new BootstrapMethod((ConstantPoolMethodHandleInfo) constantPool.get(byteVector.getShort()));
-            for (int j = 0; j < byteVector.getShort(); j++) {
+            argCount = byteVector.getShort();
+            for (int j = 0; j < argCount; j++) {
                 newBootstrapMethod.addArgs((Parameterizable) constantPool.get(byteVector.getShort()));
             }
             putBootStrapMethod(newBootstrapMethod);

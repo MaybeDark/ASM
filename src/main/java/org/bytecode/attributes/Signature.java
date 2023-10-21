@@ -20,6 +20,7 @@ public class Signature extends VariableLengthAttribute {
 
     public Signature() {
         super((byte) (Target.class_info | Target.method_info | Target.field_info));
+        this.attributeName = "Signature";
     }
 
     public static Signature genericsOfClass(@NotNull GenericWrapper[] generics, @Nullable Type superClass, @Nullable Type... implementsClasses) {

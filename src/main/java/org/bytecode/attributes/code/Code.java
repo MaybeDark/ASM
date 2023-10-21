@@ -14,6 +14,7 @@ import org.bytecode.attributes.code.instruction.Instruction;
 import org.bytecode.attributes.code.instruction.InstructionSet;
 import org.bytecode.attributes.code.instruction.Operator;
 import org.bytecode.constantpool.ConstantPool;
+import org.bytecode.constantpool.info.ConstantPoolClassInfo;
 import org.bytecode.method.MethodWriter;
 import org.exception.TypeErrorException;
 import org.tools.ArrayTool;
@@ -42,8 +43,7 @@ public class Code extends VariableLengthAttribute {
 
     private boolean needStackMapTable = false;
 
-    //TODO
-    private short handCount = 0;
+    private ExceptionTable exceptionTable = new ExceptionTable();
 
     private int codeLength = 0;
 
@@ -62,8 +62,8 @@ public class Code extends VariableLengthAttribute {
      * 如果不是通过visitor新建则需通过此方法初始化
      */
     public Code initByWriter(MethodWriter owner) {
-        if (owner.isStatic()) {
-            locals.put(new LocalVariableWrapper("this", owner.getClassName()));
+        if (! owner.isStatic()) {
+            locals.put(new LocalVariableWrapper("this", Type.getClassDescriptor(owner.getClassName())));
         }
 
         if (ArrayTool.notNull(owner.getParameterTypes())) {
@@ -537,9 +537,11 @@ public class Code extends VariableLengthAttribute {
         appendInstruction(codeHelper.invokeDynamic(callSite));
         stack.put(callSite.getTargetType());
     }
-    public void return0(){
+    public void return0() {
         appendInstruction(returnInst);
-        stack.pop();
+        if (returnInst.opcode != InstructionSet.RETURN.opcode) {
+            stack.pop();
+        }
     }
 
     public void end() {
@@ -580,7 +582,8 @@ public class Code extends VariableLengthAttribute {
         byteVector.skip(2);
         codeVisit(byteVector);
         handlerVisit(constantPool, byteVector);
-        for (int i = 0; i < byteVector.getShort(); i++) {
+        short attrCount = byteVector.getShort();
+        for (int i = 0; i < attrCount; i++) {
             addAttribute(helper.visit(constantPool, byteVector));
         }
         isEnd = true;
@@ -588,16 +591,27 @@ public class Code extends VariableLengthAttribute {
     }
 
     private void handlerVisit(ConstantPool constantPool, ByteVector byteVector) {
-        for (int i = 0; i < byteVector.getShort(); i++) {
-
+        short count = byteVector.getShort();
+        for (int i = 0; i < count; i++) {
+            exceptionTable.putHandler(byteVector.getShort(),
+                    byteVector.getShort(),
+                    byteVector.getShort(),
+                    Type.getType(Type.getClassDescriptor(((ConstantPoolClassInfo) constantPool.get(byteVector.getShort())).getClassInfo())));
         }
     }
 
     private void codeVisit(ByteVector byteVector) {
-        int length = byteVector.getInt();
+        int length = byteVector.getInt(), instLength;
+        byte[] operand;
+        Instruction instruction;
         for (int i = 0; i != length; ) {
-            Instruction instruction = new Instruction(byteVector.getByte());
-            byte[] operand = byteVector.getArray(instruction.length - 1);
+            instruction = new Instruction(byteVector.getByte());
+            instLength = instruction.length - 1;
+            if (instLength < 0) {
+                i += visitSwitch(i, instruction, byteVector);
+                continue;
+            }
+            operand = byteVector.getArray(instLength);
             instruction.setOperand(operand);
             appendInstruction(instruction);
             i += instruction.length;
@@ -606,6 +620,36 @@ public class Code extends VariableLengthAttribute {
             }
         }
     }
+
+    private int visitSwitch(int codeLength, Instruction switchInst, ByteVector byteVector) {
+        int low, high;
+        ByteVectors operandByteVector = new ByteVectors();
+        for (int i = 0; i < 4 - ((codeLength + 1) % 4); i++) {
+            operandByteVector.putByte(0);
+            byteVector.skip(1);
+        }
+
+        switch (switchInst.opcode) {
+            case - 86:
+                operandByteVector.putInt(byteVector.getInt());
+                low = byteVector.getInt();
+                high = byteVector.getInt();
+                operandByteVector.putInt(low);
+                operandByteVector.putInt(high);
+                for (int i = 0; i < high - low + 1; i++) {
+                    operandByteVector.putInt(byteVector.getInt());
+                }
+                break;
+            case - 87:
+                //TODO
+//                operandByteVector.putInt(byteVector.getInt());
+                break;
+        }
+        switchInst.setOperand(operandByteVector.toByteArray());
+        appendInstruction(switchInst);
+        return 1 + operandByteVector.getLength();
+    }
+
 
     public boolean isEmpty() {
         return codeLength == 0;
@@ -670,7 +714,7 @@ public class Code extends VariableLengthAttribute {
                 .putShort(locals.getMax())
                 .putInt(codeLength)
                 .putArray(codeToByteArray())
-                .putShort(handCount)
+                .putArray(exceptionTable.toByteArray())
                 .putShort(attributeCount)
                 .putArray(attrBytes);
         attributeLength = 0;

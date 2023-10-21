@@ -33,7 +33,7 @@ public class MethodWriter implements ByteCodeWriter {
     private LocalVariableWrapper[] parameters;
     private Type[] parameterTypes;
     private Type returnType;
-    private final Code code;
+    private Code code;
     private int callSiteCount;
     private final Map<String, Attribute> attributes;
 
@@ -42,7 +42,6 @@ public class MethodWriter implements ByteCodeWriter {
         this.access = access;
         this.methodName = methodName;
         this.code = new Code();
-        code.initByWriter(this);
         this.parameters = parameters;
         this.returnType = returnType;
         attributes = new HashMap<>();
@@ -55,8 +54,34 @@ public class MethodWriter implements ByteCodeWriter {
         } else {
             this.methodDesc = Type.getMethodDescriptor(returnType);
         }
+        code.initByWriter(this);
         attributes.put("Code", code);
     }
+
+    public MethodWriter(ClassWriter classWriter, int access, String methodName, String methodDesc) {
+        this.classWriter = classWriter;
+        this.access = access;
+        this.methodName = methodName;
+        this.methodDesc = methodDesc;
+        parameterTypes = Type.getArgumentTypes(methodDesc);
+        if (ArrayTool.notNull(parameterTypes)) {
+            parameters = new LocalVariableWrapper[parameterTypes.length];
+            for (int i = 0; i < parameters.length; i++) {
+                parameters[i] = new LocalVariableWrapper("arg" + i, parameterTypes[i]);
+            }
+        }
+        attributes = new HashMap<>();
+    }
+
+    public void setCode(Code code) {
+        this.code = code;
+    }
+
+    public void Override() {
+        this.code = new Code();
+        code.initByWriter(this);
+    }
+
 
     public boolean isStatic() {
         return Access.isStatic(access);
@@ -262,14 +287,20 @@ public class MethodWriter implements ByteCodeWriter {
         return this;
     }
 
+    public MethodWriter return_() {
+        code.return0();
+        return this;
+    }
+
+
     public ClassWriter endMethod() {
         code.end();
         return classWriter;
     }
 
     public MethodWriter addAttribute(Attribute attribute) {
-        if (Target.check(attribute.target, Target.method_info))
-            throw new RuntimeException(attribute.getAttributeName() + "not a method attribute");
+        if (! Target.check(attribute.target, Target.method_info))
+            throw new RuntimeException(attribute.getAttributeName() + " not a method attribute");
         attributes.put(attribute.getAttributeName(), attribute);
         return this;
     }

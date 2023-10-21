@@ -37,7 +37,8 @@ public class LineNumberTable extends Attribute {
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         byteVector.skip(4);
-        for (int i = 0; i < byteVector.getShort(); i++) {
+        short count = byteVector.getShort();
+        for (int i = 0; i < count; i++) {
             put(byteVector.getShort(), byteVector.getShort());
         }
         return this;

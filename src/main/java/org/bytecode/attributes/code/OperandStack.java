@@ -76,8 +76,6 @@ public class OperandStack {
         return pop;
     }
 
-
-
     public short pop(int num){
         for (int i = 0; i < num; i++) {
             pop();

@@ -21,7 +21,6 @@ public class LocalVariableWrapper {
      * 但是不初始化仍会占用局部变量表
      */
     private boolean initialized = false;
-    private boolean loaded = false;
     private short tableIndex = - 1;
 
 
@@ -91,15 +90,26 @@ public class LocalVariableWrapper {
         return descCpIndex;
     }
 
+    public void setDesc(String desc) {
+        this.desc = desc;
+        this.descCpIndex = 0;
+    }
+
     public void setDescCpIndex(short descCpIndex) {
         this.descCpIndex = descCpIndex;
     }
 
+    public boolean isLoaded() {
+        return nameCpIndex != 0 && descCpIndex != 0;
+    }
+
     public short load(ConstantPool cp) {
+        if (isLoaded()) {
+            return nameCpIndex;
+        }
         nameCpIndex = cp.putUtf8Info(name);
         descCpIndex = cp.putUtf8Info(desc);
-        loaded = true;
-        return 0;
+        return nameCpIndex;
     }
 
     public Type getType() {
@@ -115,10 +125,6 @@ public class LocalVariableWrapper {
 
     public String getDesc() {
         return desc;
-    }
-
-    public boolean isLoaded() {
-        return loaded;
     }
 
     public boolean isInitialized() {
@@ -146,7 +152,17 @@ public class LocalVariableWrapper {
         this.length = end - startPc;
     }
 
+    public void setName(String name) {
+        this.name = name;
+        nameCpIndex = 0;
+    }
+
     public String getName() {
         return this.name;
+    }
+
+    public void ldc(ConstantPool constantPool) {
+        name = constantPool.getUtf8(nameCpIndex);
+        desc = constantPool.getUtf8(descCpIndex);
     }
 }
