@@ -18,7 +18,7 @@ public enum ConstantPoolTag {
     CONSTANT_MethodType_info(0x10),
     CONSTANT_InvokeDynamic_info(0x12);
 
-    byte tagNum;
+    private final byte tagNum;
     ConstantPoolTag(int tagNum){
         this.tagNum = (byte) tagNum;
     }
@@ -36,21 +36,22 @@ public enum ConstantPoolTag {
     }
 
     public boolean isSymbolicReferenceConstantPoolInfo(){
-        switch (this){
-            case CONSTANT_Class_info:
-            case CONSTANT_String_info:
-            case CONSTANT_Fieldref_info:
-            case CONSTANT_Methodref_info:
-            case CONSTANT_InterfaceMethodref_info:
-            case CONSTANT_NameAndType_info:
-            case CONSTANT_MethodHandle_info:
-            case CONSTANT_MethodType_info:
-            case CONSTANT_InvokeDynamic_info:
+        switch (tagNum) {
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 15:
+            case 16:
+            case 18:
                 return true;
             default:
                 return false;
         }
     }
+
     public boolean isTiteralConstantPoolInfo(){
         switch (this){
             case CONSTANT_Utf8_info:

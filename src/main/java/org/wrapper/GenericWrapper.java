@@ -8,15 +8,18 @@ public class GenericWrapper {
 
     private final String genericName;
     private final Type extendsBy;
+    private boolean defined = false;
 
     public GenericWrapper(String genericName, Type extendsBy) {
         this.genericName = genericName;
         this.extendsBy = extendsBy;
     }
+
     public GenericWrapper(String genericName){
         this.genericName = genericName;
         this.extendsBy = Type.getType(Object.class);
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -37,5 +40,13 @@ public class GenericWrapper {
 
     public Type getExtendsBy() {
         return extendsBy;
+    }
+
+    public boolean isDefined() {
+        return defined;
+    }
+
+    public void setDefined(boolean defined) {
+        this.defined = defined;
     }
 }

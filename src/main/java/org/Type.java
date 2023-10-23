@@ -79,12 +79,8 @@ public final class Type {
         return sb.toString();
     }
 
-    public static String getClassDescriptor(@NotNull String fullClassName){
-        StringBuilder sb = new StringBuilder();
-        sb.append('L');
-        sb.append(fullClassName);
-        sb.append(';');
-        return sb.toString();
+    public static String getClassDescriptor(@NotNull String classInfo) {
+        return 'L' + classInfo + ';';
     }
 
 
@@ -116,13 +112,13 @@ public final class Type {
         sb.append('(');
         if (ArrayTool.notNull(argumentTypes)) {
             for (Type argumentType : argumentTypes) {
-                if (argumentType == null || argumentType.equals(Type.VOID))
+                if (argumentType == null || argumentType.isVoidType())
                     break;
                 sb.append(argumentType.desc);
             }
         }
         sb.append(')');
-        if (returnType == null || returnType.equals(Type.VOID)) {
+        if (returnType == null || returnType.isVoidType()) {
             sb.append('V');
         } else {
             sb.append(returnType.desc);
@@ -302,8 +298,6 @@ public final class Type {
         return getType("[" + componentType.getDescriptor());
     }
 
-
-
     public boolean isPrimitiveType() {
         return code <= 8 && code >= 1;
     }
@@ -335,7 +329,7 @@ public final class Type {
         if (methodType == null){
             throw new RuntimeException("methodType must be not null");
         }
-        if (!methodType.isMethodType()) {
+        if (! methodType.isMethodType()) {
             throw new TypeErrorException("type must be is a method type");
         }
         return getArgumentTypes(methodType.getDescriptor());
@@ -345,22 +339,30 @@ public final class Type {
         return desc;
     }
 
-    public String getFullClassName(){
-        if (!(isObjectType() || isArrayType()))
+    public String getClassInfo() {
+        if (! (isObjectType() || isArrayType()))
             throw new TypeErrorException(getDescriptor() + " not an object type");
         String descriptor = getDescriptor();
-        if (descriptor.startsWith("L")){
+        if (descriptor.startsWith("L")) {
             descriptor = descriptor.substring(1, descriptor.length() - 1);
         }
         return descriptor;
     }
 
-    public boolean isLongOrDoubleType(){
+    public boolean isLongOrDoubleType() {
         return code == 7 || code == 8;
     }
 
     public boolean isObjectType() {
         return code == 10;
+    }
+
+    public boolean isBooleanType() {
+        return code == 1;
+    }
+
+    public boolean isRuntimeIntType() {
+        return code <= 5 && code >= 1;
     }
 
     public boolean isVoidType() {

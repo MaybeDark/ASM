@@ -1,34 +1,30 @@
 package org.wrapper;
 
-import org.Loadable;
-import org.Type;
-import org.bytecode.Specification;
-import org.bytecode.constantpool.ConstantPool;
 import com.sun.istack.internal.Nullable;
-import org.exception.TypeErrorException;
+import org.Type;
+import org.bytecode.constantpool.ConstantPool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
-public class MethodWrapper{
+import static org.bytecode.ConstructorWriter.CONSTRUCTOR_METHODNAME;
+
+public class MethodWrapper {
 
     private final String className;
     private final String methodName;
     private String methodDesc;
     private Type returnType;
     private Type[] parameterTypes;
-    private int    parameterCount;
-    private int    pop;
+    private int parameterCount;
+    private int pop;
     private int    put;
     private boolean loaded = false;
     private short  methodInfoIndex;
 
     public MethodWrapper(Executable method){
-//        fullClassName = ;
+//        classInfo = ;
 //        if (method instanceof Constructor){
 //            methodName = Specification.CONSTRUCTOR_METHODNAME;
 //        }else if (method instanceof Method){
@@ -38,30 +34,30 @@ public class MethodWrapper{
 //            throw new RuntimeException("Just support JDK1.8");
 //        }
 //        this.parameterTypes = Type.getType(method.getParameterTypes());
-        this(Type.getType(method.getDeclaringClass()).getFullClassName(),
-                method instanceof Constructor?Specification.CONSTRUCTOR_METHODNAME:method.getName(),
-                method instanceof Constructor?null:Type.getType(((Method) method).getReturnType()),
+        this(Type.getType(method.getDeclaringClass()).getClassInfo(),
+                method instanceof Constructor ? CONSTRUCTOR_METHODNAME : method.getName(),
+                method instanceof Constructor ? null : Type.getType(((Method) method).getReturnType()),
                 Type.getType(method.getParameterTypes())
-            );
+        );
     }
 
-    public MethodWrapper(String fullClassName, String methodName, @Nullable Type returnType, Type... parameterType){
-        this.className = fullClassName;
+    public MethodWrapper(String classInfo, String methodName, @Nullable Type returnType, Type... parameterType) {
+        this.className = classInfo;
         this.methodName = methodName;
         this.returnType = returnType;
-        parseMethod(returnType,parameterType);
+        parseMethod(returnType, parameterType);
     }
 
 
 //    public MethodWrapper(Type classType, String methodName, @Nullable Type returnType, Type... parameterType){
-//        this(classType.getFullClassName(),methodName,returnType,parameterType);
+//        this(classType.getclassInfo(),methodName,returnType,parameterType);
 //    }
 //
 //    public MethodWrapper(Type classType, String methodName,Type methodType){
-//        this(classType.getFullClassName(),methodName,methodType);
+//        this(classType.getclassInfo(),methodName,methodType);
 //    }
-//    public MethodWrapper(String fullClassName, String methodName,Type methodType){
-//        this.fullClassName = fullClassName;
+//    public MethodWrapper(String classInfo, String methodName,Type methodType){
+//        this.classInfo = classInfo;
 //        this.methodName = methodName;
 //        if (methodType == null) {
 //            parseMethod(null, null);
@@ -82,8 +78,8 @@ public class MethodWrapper{
             put = 1;
         }
 
-        if (parameterType != null && parameterType.length != 0){
-            if (parameterType.length == 1 && parameterType[0].equals(Type.VOID)){
+        if (parameterType != null && parameterType.length != 0) {
+            if (parameterType.length == 1 && parameterType[0].equals(Type.VOID)) {
                 return;
             }
             parameterCount = parameterType.length;
@@ -91,8 +87,8 @@ public class MethodWrapper{
         }
     }
 
-    public short load(ConstantPool constantPool){
-        if (loaded){
+    public short load(ConstantPool constantPool) {
+        if (loaded) {
             return methodInfoIndex;
         }
         methodInfoIndex = constantPool.putMethodrefInfo(className, methodName, methodDesc);
@@ -100,8 +96,8 @@ public class MethodWrapper{
         return methodInfoIndex;
     }
 
-//    public static MethodWrapper buildConstructor(String fullClassName,Type... parameterType){
-//        return new MethodWrapper(fullClassName,"<init>",Type.VOID,parameterType);
+//    public static MethodWrapper buildConstructor(String classInfo,Type... parameterType){
+//        return new MethodWrapper(classInfo,"<init>",Type.VOID,parameterType);
 //    }
 
 

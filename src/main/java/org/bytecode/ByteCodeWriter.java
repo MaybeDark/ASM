@@ -1,6 +1,6 @@
 package org.bytecode;
 
-import org.bytecode.attributes.common.Attribute;
+import org.bytecode.attributes.Attribute;
 
 public interface ByteCodeWriter {
     byte[] toByteArray();

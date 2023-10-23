@@ -1,5 +1,6 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 import org.bytecode.constantpool.Parameterizable;
 import org.bytecode.constantpool.ReferenceKind;
@@ -7,31 +8,37 @@ import org.tools.ArrayTool;
 import org.tools.ConvertTool;
 
 public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolInfo implements Parameterizable {
-    private final byte type;
-    private final String fullClassName;
+    private byte type;
+    private String classInfo;
     private String name;
-    private final String desc;
+    private String desc;
 
-    public ConstantPoolMethodHandleInfo(byte type, String fullClassName, String name, String desc,byte[] ref) {
+    public ConstantPoolMethodHandleInfo(byte type, String classInfo, String name, String desc, byte[] ref) {
         super(ConstantPoolTag.CONSTANT_MethodHandle_info);
         this.type = type;
-        this.fullClassName = fullClassName;
+        this.classInfo = classInfo;
         this.name = name;
         this.desc = desc;
         if (ref != null)
-            setValue(ArrayTool.join(type,ref));
+            setValue(ArrayTool.join(type, ref));
     }
 
-    public ConstantPoolMethodHandleInfo(byte type, String fullClassName, String name, String desc) {
-        this(type,fullClassName,name,desc,null);
+    public ConstantPoolMethodHandleInfo(byte type, byte[] ref) {
+        super(ConstantPoolTag.CONSTANT_MethodHandle_info);
+        this.type = type;
+        setValue(ArrayTool.join(type, ref));
     }
 
-    public ConstantPoolMethodHandleInfo(ReferenceKind referenceKind, String fullClassName, String name, String desc) {
-        this(referenceKind,fullClassName,name,desc,null);
+    public ConstantPoolMethodHandleInfo(byte type, String classInfo, String name, String desc) {
+        this(type, classInfo, name, desc, null);
     }
 
-    ConstantPoolMethodHandleInfo(ReferenceKind referenceKind, String fullClassName, String name, String desc,byte[] ref) {
-        this((byte) referenceKind.getKey(),fullClassName,name,desc,ref);
+    public ConstantPoolMethodHandleInfo(ReferenceKind referenceKind, String classInfo, String name, String desc) {
+        this(referenceKind, classInfo, name, desc, null);
+    }
+
+    ConstantPoolMethodHandleInfo(ReferenceKind referenceKind, String classInfo, String name, String desc, byte[] ref) {
+        this((byte) referenceKind.getKey(), classInfo, name, desc, ref);
     }
 
     public ReferenceKind getKind() {
@@ -39,24 +46,47 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
     }
 
     @Override
+    public void ldc(ConstantPool constantPool) {
+        AbsConstantPoolInfo handleInfo = constantPool.get(ConvertTool.B2S(value[1], value[2]));
+        byte[] infoValue = handleInfo.getValue();
+        classInfo = constantPool.getUtf8OfClassInfo(ConvertTool.B2S(infoValue[1], infoValue[2]));
+        ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(infoValue[3], infoValue[4]));
+        nameAndTypeInfo.ldc(constantPool);
+        this.name = nameAndTypeInfo.getName();
+        this.desc = nameAndTypeInfo.getDesc();
+    }
+
+    @Override
     public String valueToString() {
-        return String.format("%s #%d",getKind(),ConvertTool.B2S(value[1],value[2]));
+        return String.format("%s #%d", getKind(), ConvertTool.B2S(value[1], value[2]));
     }
 
     public String getDesc() {
         return desc;
     }
 
-    public String getFullClassName() {
-        return fullClassName;
+    public String getClassInfo() {
+        return classInfo;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
+    public void setClassInfo(String classInfo) {
+        this.classInfo = classInfo;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    @Override
+    public short load(ConstantPool constantPool) {
+        return constantPool.putMethodHandleInfo(getKind(), classInfo, name, desc);
+    }
 }

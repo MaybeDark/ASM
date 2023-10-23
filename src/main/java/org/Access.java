@@ -94,7 +94,7 @@ public interface Access{
     static boolean isSuper(int access){return isAay(access,ACC_SUPER);}
 
     static boolean isAay(int access,int any){
-        return (access & any) == any;
+        return (access & any) != 0;
     }
 
     static String parseFieldAccess(final int access){
@@ -151,7 +151,7 @@ public interface Access{
         return result.toString();
     }
 
-    public static String parseClassAccess(int access){
+    static String parseClassAccess(int access) {
         StringBuilder result = new StringBuilder();
         if (isPublic(access))
             result.append("public ");

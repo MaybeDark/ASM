@@ -2,14 +2,15 @@ package org.tools;
 
 public class ByteVector {
     private byte[] data;
-    private int writePoint,readPoint;
+    private int writePoint, readPoint, mark = 0;
 
     public ByteVector(final int initialSize) {
         data = new byte[initialSize];
     }
-    public ByteVector(final byte[] data){
-        this(data.length);
-        putArray(data);
+
+    public ByteVector(final byte[] data) {
+        this.data = data;
+        this.writePoint = data.length;
     }
 
     public ByteVector putByte(final int b) {
@@ -75,14 +76,33 @@ public class ByteVector {
         return ConvertTool.B2L(bytes);
     }
 
-    public byte[] getArray(int length){
+    public byte[] getArray(int length) {
         byte[] bytes = new byte[length];
-        System.arraycopy(data,readPoint,bytes,0,length);
+        System.arraycopy(data, readPoint, bytes, 0, length);
         readPoint += length;
         return bytes;
     }
 
-    public boolean isEmpty(){
+    public void mark() {
+        mark = readPoint;
+    }
+
+    public void back() {
+        readPoint = mark;
+    }
+
+    public void reset() {
+        readPoint = 0;
+    }
+
+    public void skip(int length) {
+        if (length >= data.length || length < 0) {
+            throw new RuntimeException("args0 must be >0 and <= size");
+        }
+        readPoint += length;
+    }
+
+    public boolean isEmpty() {
         return writePoint == 0;
     }
 
@@ -90,10 +110,12 @@ public class ByteVector {
         return writePoint;
     }
 
-    public byte[] end(){
-        if (isEmpty()){ return null; }
+    public byte[] end() {
+        if (isEmpty()) {
+            return null;
+        }
         byte[] result = new byte[writePoint];
-        System.arraycopy(data,0,result,0,writePoint);
+        System.arraycopy(data, 0, result, 0, writePoint);
         data = null;
         return result;
     }

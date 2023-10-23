@@ -1,25 +1,45 @@
 package org.bytecode.constantpool.info;
 
+import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.ConstantPoolTag;
 import org.bytecode.constantpool.Parameterizable;
+import org.tools.ConvertTool;
 
 public class ConstantPoolClassInfo extends SymbolicReferenceConstantPoolInfo implements Parameterizable {
 
-    private final String fullClassName;
+    private String classInfo;
 
-    public ConstantPoolClassInfo(String fullClassName,byte[] ref) {
+    public ConstantPoolClassInfo(String classInfo, byte[] ref) {
         super(ConstantPoolTag.CONSTANT_Class_info);
-        this.fullClassName = fullClassName;
+        this.classInfo = classInfo;
         setValue(ref);
     }
 
-    public ConstantPoolClassInfo(String fullClassName){
+    public ConstantPoolClassInfo(String classInfo) {
         super(ConstantPoolTag.CONSTANT_Class_info);
-        this.fullClassName = fullClassName;
+        this.classInfo = classInfo;
     }
 
+    public ConstantPoolClassInfo(byte[] ref) {
+        super(ConstantPoolTag.CONSTANT_Class_info);
+        setValue(ref);
+    }
 
-    public String getFullClassName() {
-        return fullClassName;
+    public void setClassInfo(String classInfo) {
+        this.classInfo = classInfo;
+    }
+
+    public String getClassInfo() {
+        return classInfo;
+    }
+
+    @Override
+    public short load(ConstantPool constantPool) {
+        return constantPool.putClassInfo(classInfo);
+    }
+
+    @Override
+    public void ldc(ConstantPool constantPool) {
+        classInfo = constantPool.getUtf8(ConvertTool.B2S(value));
     }
 }
