@@ -53,15 +53,16 @@ public class BootstrapMethod {
         if (loaded) {
             return;
         }
-        ByteVector value = new ByteVector(length);
-        value.putShort(constantPool.putMethodHandleInfo(referenceKind, classInfo, methodName, methodDesc));
-        value.putShort(argsCount);
+        short infoIndex;
+        ByteVector byteVector = new ByteVector(length);
+        byteVector.putShort(constantPool.putMethodHandleInfo(referenceKind, classInfo, methodName, methodDesc));
+        byteVector.putShort(argsCount);
         for (int i = 0; i < argsCount; i++) {
-            short infoIndex = constantPool.resolveConstantPoolInfo((AbsConstantPoolInfo) args[i]);
-            value.putShort(infoIndex);
+            infoIndex = constantPool.resolveConstantPoolInfo((AbsConstantPoolInfo) args[i]);
+            byteVector.putShort(infoIndex);
         }
         loaded = true;
-        this.value = value.end();
+        this.value = byteVector.end();
     }
 
     public ReferenceKind getReferenceKind() {

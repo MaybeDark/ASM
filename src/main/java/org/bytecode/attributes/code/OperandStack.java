@@ -96,7 +96,6 @@ public class OperandStack {
     private void considerExpansion(int depth) {
         if(currentDepth+depth <= currentSize)
             return;
-
         if (currentSize * 2 >= (1<<16))
             throw new RuntimeException("operand stack too large");
         Type[] newFrame = new Type[currentSize * 2];

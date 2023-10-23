@@ -2,11 +2,11 @@ package org.visitor;
 
 import org.Type;
 import org.bytecode.ClassWriter;
+import org.bytecode.FieldWriter;
+import org.bytecode.MethodWriter;
 import org.bytecode.attributes.code.Code;
 import org.bytecode.constantpool.info.ConstantPoolClassInfo;
 import org.bytecode.constantpool.info.ConstantPoolUtf8Info;
-import org.bytecode.field.FieldWriter;
-import org.bytecode.method.MethodWriter;
 import org.exception.NoSupportException;
 import org.tools.ByteVector;
 import org.wrapper.ClassWrapper;

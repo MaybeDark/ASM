@@ -192,16 +192,6 @@ public class ConstantPool extends AbsConstantPool implements Visitor<ConstantPoo
         for (int i = 0; i < constantPoolCount - 1; i++) {
             byteVectors.putArray(pool.get(i).toByteArray());
         }
-//        int size = 0;
-//        size += 2; //length mark;
-//        for (int i = 0; i < constantPoolCount - 1; i++) {
-//            size += pool.get(i).getLength();
-//        }
-//        ByteVector result = new ByteVector(size);
-//        result.putShort(constantPoolCount);
-//        for (int i = 0; i < constantPoolCount - 1; i++) {
-//            result.putArray(pool.get(i).toByteArray());
-//        }
         return byteVectors.toByteArray();
     }
 
@@ -285,92 +275,8 @@ public class ConstantPool extends AbsConstantPool implements Visitor<ConstantPoo
         if (Objects.isNull(scpi)) {
             throw new NotNullException("args0 must be not null");
         }
-//        short infoIndex;
-//        switch (scpi.getTag()) {
-//            case CONSTANT_InterfaceMethodref_info:
-//                ConstantPoolInterfaceMethodrefInfo cpimr = (ConstantPoolInterfaceMethodrefInfo) scpi;
-//                infoIndex = putInterfaceMethodrefInfo(cpimr.getInterfaceInfo(), cpimr.getMethodName(), cpimr.getMethodDesc());
-//                break;
-//            case CONSTANT_InvokeDynamic_info:
-//                throw new RuntimeException("this method no support resolve this info");
-//            case CONSTANT_Methodref_info:
-//                ConstantPoolMethodrefInfo cpmri = (ConstantPoolMethodrefInfo) scpi;
-//                infoIndex = putMethodrefInfo(cpmri.getClassInfo(), cpmri.getMethodName(), cpmri.getMethodDesc());
-//                break;
-//            case CONSTANT_NameAndType_info:
-//                ConstantPoolNameAndTypeInfo cpnati = (ConstantPoolNameAndTypeInfo) scpi;
-//                infoIndex = putNameAndTypeInfo(cpnati.getName(), cpnati.getDesc());
-//                break;
-//            case CONSTANT_Utf8_info:
-//                ConstantPoolUtf8Info cpui = (ConstantPoolUtf8Info) scpi;
-//                infoIndex = putUtf8Info(cpui.literalToString());
-//                break;
-//            case CONSTANT_Fieldref_info:
-//                ConstantPoolFieldrefInfo cpfri = (ConstantPoolFieldrefInfo) scpi;
-//                infoIndex = putFieldrefInfo(cpfri.getClassInfo(), cpfri.getFieldName(), cpfri.getFileDesc());
-//                break;
-//            case CONSTANT_Class_info:
-//                ConstantPoolClassInfo cpci = (ConstantPoolClassInfo) scpi;
-//                infoIndex = putClassInfo(cpci.getClassInfo());
-//                break;
-//            case CONSTANT_Double_info:
-//                ConstantPoolDoubleInfo cpdi = (ConstantPoolDoubleInfo) scpi;
-//                infoIndex = putDoubleInfo(Double.parseDouble(cpdi.literalToString()));
-//                break;
-//            case CONSTANT_Float_info:
-//                ConstantPoolFloatInfo cpfi = (ConstantPoolFloatInfo) scpi;
-//                infoIndex = putFloatInfo(Float.parseFloat(cpfi.literalToString()));
-//                break;
-//            case CONSTANT_Integer_info:
-//                ConstantPoolIntegerInfo cpii = (ConstantPoolIntegerInfo) scpi;
-//                infoIndex = putIntegerInfo(Integer.parseInt(cpii.literalToString()));
-//                break;
-//            case CONSTANT_Long_info:
-//                ConstantPoolLongInfo cpli = (ConstantPoolLongInfo) scpi;
-//                infoIndex = putLongInfo(Long.parseLong(cpli.literalToString()));
-//                break;
-//            case CONSTANT_MethodHandle_info:
-//                ConstantPoolMethodHandleInfo cpmhi = (ConstantPoolMethodHandleInfo) scpi;
-//                infoIndex = putMethodHandleInfo(cpmhi.getKind(), cpmhi.getClassInfo(), cpmhi.getName(), cpmhi.getDesc());
-//                break;
-//            case CONSTANT_MethodType_info:
-//                ConstantPoolMethodTypeInfo cpmti = (ConstantPoolMethodTypeInfo) scpi;
-//                infoIndex = putMethodTypeInfo(cpmti.getMethodDesc());
-//                break;
-//            case CONSTANT_String_info:
-//                ConstantPoolStringInfo cpsi = (ConstantPoolStringInfo) scpi;
-//                infoIndex = putStringInfo(cpsi.getLiteral());
-//                break;
-//        }
         return scpi.load(this);
     }
-
-//    public byte[] resolveBootstrapMethod(BootstrapMethod bm) {
-//        int argsIndex = 0;
-//        int argsCount = bm.getArgsCount();
-//        byte[] result = new byte[2 + 2 + argsCount * 2];
-//        int methodHandleInfoIndex = putMethodHandleInfo(bm.getReferenceKind(), bm.getclassInfo(), bm.getMethodName(), bm.getMethodDesc());
-//        System.arraycopy(ConvertTool.S2B((short) methodHandleInfoIndex), 0, result, 0, 2);
-//        System.arraycopy(ConvertTool.S2B((short) argsCount), 0, result, 2, 2);
-//        List<Parameterizable> args = bm.getArgs();
-//        if (args == null) {
-//            return result;
-//        }
-//        for (int i = 0; i < argsCount; i++) {
-//            Parameterizable arg = args.get(i);
-//            int infoIndex = resolveConstantPoolInfo((AbsConstantPoolInfo) arg);
-//            args.set(i, (Parameterizable) get(infoIndex));
-//            System.arraycopy(ConvertTool.S2B((short) infoIndex), 0, result, 4 + 2 * (argsIndex++), 2);
-//        }
-//        return result;
-//    }
-
-//    @Override
-//    public AbsConstantPoolInfo[] getPool() {
-//        AbsConstantPoolInfo[] result = new AbsConstantPoolInfo[constantPoolCount - 1];
-//        System.arraycopy(pool, 0, result, 0, constantPoolCount - 1);
-//        return result;
-//    }
 
     public String print() {
         StringBuilder sb = new StringBuilder();

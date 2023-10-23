@@ -47,13 +47,16 @@ public class ByteVectors{
     }
 
     public ByteVectors putArray(final byte[] bytes){
+        if (bytes == null || bytes.length == 0) {
+            return this;
+        }
         byte[] data = bytes;
         int arrayLength = bytes.length;
-        if (writeLength + arrayLength > SIZE){
+        if (writeLength + arrayLength > SIZE) {
             data = putPartArray(bytes);
             enlarge();
             putArray(data);
-        }else{
+        } else {
             writePoint.putArray(data);
             this.length += arrayLength;
             this.writeLength += arrayLength;

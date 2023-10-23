@@ -1,10 +1,8 @@
-package org.bytecode.method;
+package org.bytecode;
 
 import com.sun.istack.internal.Nullable;
 import org.Access;
 import org.Type;
-import org.bytecode.ByteCodeWriter;
-import org.bytecode.ClassWriter;
 import org.bytecode.attributes.Attribute;
 import org.bytecode.attributes.Target;
 import org.bytecode.attributes.bootstrapmethods.CallSite;

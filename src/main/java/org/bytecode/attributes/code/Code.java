@@ -1,6 +1,7 @@
 package org.bytecode.attributes.code;
 
 import org.Type;
+import org.bytecode.MethodWriter;
 import org.bytecode.attributes.Attribute;
 import org.bytecode.attributes.LocalVariableTable;
 import org.bytecode.attributes.Target;
@@ -13,9 +14,9 @@ import org.bytecode.attributes.code.instruction.CodeHelper;
 import org.bytecode.attributes.code.instruction.Instruction;
 import org.bytecode.attributes.code.instruction.InstructionSet;
 import org.bytecode.attributes.code.instruction.Operator;
+import org.bytecode.attributes.stackmaptable.StackMapTable;
 import org.bytecode.constantpool.ConstantPool;
 import org.bytecode.constantpool.info.ConstantPoolClassInfo;
-import org.bytecode.method.MethodWriter;
 import org.exception.TypeErrorException;
 import org.tools.ArrayTool;
 import org.tools.ByteVector;
@@ -80,25 +81,9 @@ public class Code extends VariableLengthAttribute {
     }
 
     private void initStackMapTable() {
-
+        //TODO
     }
 
-    //    public Code(@Nullable MethodWriter methodWriter, @Nullable Type returnType, @Nullable LocalVariableWrapper... parameters) {
-//        attributeName = "Code";
-//        this.returnType = returnType;
-//        this.parameters = parameters;
-//        this.attributes = new HashMap<>();
-//        this.bracketStack = new BracketStack();
-//        this.instructionFactory = new InstructionFactory(methodWriter.classWriter.getConstantPool());
-//        bracketStack.put(new Bracket(0));
-//        instructionFactory.setReturnType(returnType);
-//        if (Access.isStatic(methodWriter.getAccess())) {
-//            initStackAndLocal(null);
-//        }else{
-//            initStackAndLocal(methodWriter.classWriter.thisClass.getType());
-//        }
-//        attributes.put("LocalVariableTable", locals);
-//    }
     public void appendInstruction(Instruction instruction) {
         if (isEnd) {
             throw new RuntimeException("code is end can't modify");
@@ -659,9 +644,21 @@ public class Code extends VariableLengthAttribute {
         return codeLength;
     }
 
+    private void creatStackMapTable() {
+
+        StackMapTable stackMapTable = new StackMapTable();
+        //TODO
+        addAttribute(stackMapTable);
+    }
+
     @Override
     public short load(ConstantPool cp) {
-        if (!isEnd) { end(); }
+        if (! isEnd) {
+            end();
+        }
+        if (needStackMapTable) {
+            creatStackMapTable();
+        }
         loadAttributeName(cp);
         Collection<Attribute> attr = attributes.values();
         for (Attribute attribute : attr) {

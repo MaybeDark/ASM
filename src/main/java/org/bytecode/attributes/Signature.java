@@ -25,11 +25,11 @@ public class Signature extends VariableLengthAttribute {
 
     public static Signature genericsOfClass(@NotNull GenericWrapper[] generics, @Nullable Type superClass, @Nullable Type... implementsClasses) {
         Signature newSignature = new Signature();
-        newSignature.setSignature(newSignature.getSignatureOfClass(generics, superClass, implementsClasses));
+        newSignature.setSignature(getSignatureOfClass(generics, superClass, implementsClasses));
         return newSignature;
     }
 
-    public String getSignatureOfClass(@NotNull GenericWrapper[] generics, @Nullable Type superClass, @Nullable Type... implementsClasses) {
+    public static String getSignatureOfClass(@NotNull GenericWrapper[] generics, @Nullable Type superClass, @Nullable Type... implementsClasses) {
         if (ArrayTool.notNull(generics)) {
             throw new RuntimeException("generics must be not null");
         }
@@ -58,7 +58,7 @@ public class Signature extends VariableLengthAttribute {
         return sb.toString();
     }
 
-    public String getSignatureOfField(@NotNull GenericWrapper generic) {
+    public static String getSignatureOfField(@NotNull GenericWrapper generic) {
         return "T" + generic.getGenericName() + ";";
     }
 

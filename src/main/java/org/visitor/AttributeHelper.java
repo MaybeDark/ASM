@@ -2,10 +2,7 @@ package org.visitor;
 
 import org.bytecode.attributes.Deprecated;
 import org.bytecode.attributes.*;
-import org.bytecode.attributes.annotations.RuntimeInvisibleAnnotations;
-import org.bytecode.attributes.annotations.RuntimeInvisibleParameterAnnotations;
-import org.bytecode.attributes.annotations.RuntimeVisibleAnnotations;
-import org.bytecode.attributes.annotations.RuntimeVisibleParameterAnnotations;
+import org.bytecode.attributes.annotations.*;
 import org.bytecode.attributes.bootstrapmethods.BootstrapMethods;
 import org.bytecode.attributes.code.Code;
 import org.bytecode.attributes.innerclass.InnerClasses;
@@ -38,8 +35,8 @@ public class AttributeHelper implements Visitor<Attribute> {
         attributeMap.put("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotations.class);
         attributeMap.put("RuntimeVisibleParameterAnnotations", RuntimeVisibleParameterAnnotations.class);
         attributeMap.put("RuntimeInvisibleParameterAnnotations", RuntimeInvisibleParameterAnnotations.class);
-//        attributeMap.put("RuntimeVisibleTypeAnnotations",RuntimeVisibleTypeAnnotations.class);
-//        attributeMap.put("RuntimeVisibleTypeAnnotations",RuntimeVisibleTypeAnnotations.class);
+        attributeMap.put("RuntimeVisibleTypeAnnotations", RuntimeVisibleTypeAnnotations.class);
+        attributeMap.put("RuntimeVisibleTypeAnnotations", RuntimeVisibleTypeAnnotations.class);
 //        attributeMap.put("AnnotationDefault",AnnotationDefault.class);
 //        attributeMap.put("MethodParameters",MethodParameters.class);
         attributeMap.put("SourceFile", SourceFile.class);

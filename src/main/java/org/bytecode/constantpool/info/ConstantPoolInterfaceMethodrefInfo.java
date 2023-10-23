@@ -62,9 +62,7 @@ public class ConstantPoolInterfaceMethodrefInfo extends SymbolicReferenceConstan
             return;
         }
         // 获取常量池中的类名
-        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(ConvertTool.B2S(this.value[0], this.value[1]));
-        classInfo.ldc(constantPool);
-        this.interfaceInfo = classInfo.getClassInfo();
+        interfaceInfo = constantPool.getUtf8OfClassInfo(ConvertTool.B2S(value[0], value[1]));
         // 获取常量池中的字段名
         ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(this.value[2], this.value[3]));
         nameAndTypeInfo.ldc(constantPool);

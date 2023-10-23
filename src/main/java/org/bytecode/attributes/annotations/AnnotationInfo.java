@@ -18,31 +18,32 @@ public class AnnotationInfo {
     /**
      * 注解类名
      */
-    private final String annotationType;
+    protected String annotationType;
     /**
      * 注解类名在常量池的索引{@link ConstantPoolUtf8Info}
      */
-    private short annotationTypeIndex = 0;
+    protected short annotationTypeIndex = 0;
     /**
      * 参数条数
      */
-    private short elementValuePairsCount = 0;
+    protected short elementValuePairsCount = 0;
     /**
      * 参数信息{@link ElementValuePairs}
      */
-    private Map<String, ElementValuePairs> pairs;
+    protected Map<String, ElementValuePairs> pairs = new HashMap<>();
 
     public AnnotationInfo(Class<?> annotation) {
         if (annotation == null || ! annotation.isAnnotation()) {
             throw new RuntimeException("args0 must be a annotation");
         }
         annotationType = Type.getType(annotation).getDescriptor();
-        pairs = new HashMap<>();
+    }
+
+    protected AnnotationInfo() {
     }
 
     AnnotationInfo(String annotationType) {
         this.annotationType = annotationType;
-        pairs = new HashMap<>();
     }
 
     public AnnotationInfo setElement(@NotNull String elementName, byte constValue) {
@@ -231,11 +232,12 @@ public class AnnotationInfo {
 
     static AnnotationInfo visitAnnotation(ConstantPool constantPool, ByteVector byteVector) {
         AnnotationInfo newAnnotationInfo = new AnnotationInfo(constantPool.getUtf8(byteVector.getShort()));
-        short count = byteVector.getShort();
+        short elementCount = byteVector.getShort();
         String elementName;
-        for (int i = 0; i < count; i++) {
+        ElementValue elementValue;
+        for (int i = 0; i < elementCount; i++) {
             elementName = constantPool.getUtf8(byteVector.getShort());
-            ElementValue elementValue = visitElementValue(constantPool, byteVector);
+            elementValue = visitElementValue(constantPool, byteVector);
             newAnnotationInfo.addPair(elementName, elementValue);
         }
         return newAnnotationInfo;
@@ -276,8 +278,8 @@ public class AnnotationInfo {
 
     public byte[] toByteArray() {
         ByteVectors byteVectors = new ByteVectors();
-        byteVectors.putShort(annotationTypeIndex);
-        byteVectors.putShort(elementValuePairsCount);
+        byteVectors.putShort(annotationTypeIndex)
+                .putShort(elementValuePairsCount);
         pairs.values().forEach(elementValuePairs -> byteVectors.putArray(elementValuePairs.toByteArray()));
         return byteVectors.toByteArray();
     }

@@ -1,8 +1,8 @@
 package org.bytecode.attributes.bootstrapmethods;
 
 import org.Type;
+import org.bytecode.MethodWriter;
 import org.bytecode.constantpool.info.ConstantPoolMethodHandleInfo;
-import org.bytecode.method.MethodWriter;
 
 public class CallSite {
     private final Type targetType;

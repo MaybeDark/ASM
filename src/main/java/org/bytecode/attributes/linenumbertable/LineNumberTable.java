@@ -54,8 +54,9 @@ public class LineNumberTable extends Attribute {
         result.putShort(cpIndex)
                 .putInt(attributeLength)
                 .putShort(tableLength);
+        LineNumberInfo temp;
         for (int i = 0; i < tableLength; i++) {
-            LineNumberInfo temp = table.get(i);
+            temp = table.get(i);
             result.putShort(temp.getStartPc())
                     .putShort(temp.getLineNumber());
         }

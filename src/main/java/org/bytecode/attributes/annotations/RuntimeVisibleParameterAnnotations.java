@@ -1,51 +1,80 @@
 package org.bytecode.attributes.annotations;
 
 import org.bytecode.attributes.Attribute;
+import org.bytecode.attributes.Target;
+import org.bytecode.attributes.VariableLengthAttribute;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVector;
 import org.tools.ByteVectors;
 
+import java.util.ArrayList;
+
 /**
  * 参数注解,编译后保存在方法的属性中
  * void method(@Annotation Type arg0){}
- * 和普通注解一样也分为运行时可见注解{@link RuntimeVisibleAnnotations}和运行时不可见注解{@link RuntimeInvisibleAnnotations}
  */
-public class RuntimeVisibleParameterAnnotations extends Annotations {
+public class RuntimeVisibleParameterAnnotations extends VariableLengthAttribute {
 
     /**
-     *
+     * 含注解的参数
+     * 如果中间不连续则仍会包含在parametersNum中,但是对应的annotationNum会等于0
      */
     protected byte parametersNum;
 
+    protected ArrayList<Annotations<AnnotationInfo>> annotationTable = new ArrayList<>();
+
     public RuntimeVisibleParameterAnnotations() {
-        super("RuntimeVisibleParameterAnnotations");
+        this("RuntimeVisibleParameterAnnotations");
+    }
+
+    protected RuntimeVisibleParameterAnnotations(String attributeName) {
+        super((byte) (Target.class_info | Target.field_info | Target.method_info));
+        this.attributeName = attributeName;
     }
 
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
         byteVector.skip(4);
         parametersNum = byteVector.getByte();
-        short count;
+        short annotationCount;
         for (int i = 0; i < parametersNum; i++) {
-            count = byteVector.getShort();
-            for (int j = 0; j < count; j++) {
-                addAnnotationInfo(AnnotationInfo.visitAnnotation(constantPool, byteVector));
+            annotationTable.add(new Annotations<>());
+            annotationCount = byteVector.getShort();
+            for (int j = 0; j < annotationCount; j++) {
+                annotationTable.get(i).addAnnotationInfo(AnnotationInfo.visitAnnotation(constantPool, byteVector));
             }
         }
         return this;
     }
 
     @Override
+    public boolean isEmpty() {
+        return parametersNum == 0;
+    }
+
+    @Override
     public byte[] toByteArray() {
         checkLoaded();
         ByteVectors byteVectors = new ByteVectors();
+        Annotations<AnnotationInfo> annotations;
         byteVectors.putShort(cpIndex)
                 .putInt(attributeLength)
                 .putByte(parametersNum);
         for (int i = 0; i < parametersNum; i++) {
-            byteVectors.putShort(annotationCount);
-            annotationInfos.forEach((annotationInfo) -> byteVectors.putArray(annotationInfo.toByteArray()));
+            annotations = annotationTable.get(i);
+            byteVectors.putArray(annotations.toByteArray());
         }
         return byteVectors.toByteArray();
+    }
+
+    @Override
+    public short load(ConstantPool cp) {
+        loadAttributeName(cp);
+        attributeLength = 1;
+        attributeLength += annotationTable.stream().filter(annotations -> {
+            annotations.load(cp);
+            return true;
+        }).mapToInt(Annotations::getLength).sum();
+        return cpIndex;
     }
 }

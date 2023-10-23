@@ -47,12 +47,10 @@ public class ConstantPoolMethodHandleInfo extends SymbolicReferenceConstantPoolI
 
     @Override
     public void ldc(ConstantPool constantPool) {
-        AbsConstantPoolInfo info = constantPool.get(ConvertTool.B2S(value[1], value[2]));
-        byte[] value = info.getValue();
-        ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(ConvertTool.B2S(value[1], value[2]));
-        classInfo.ldc(constantPool);
-        this.classInfo = classInfo.getClassInfo();
-        ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(value[3], value[4]));
+        AbsConstantPoolInfo handleInfo = constantPool.get(ConvertTool.B2S(value[1], value[2]));
+        byte[] infoValue = handleInfo.getValue();
+        classInfo = constantPool.getUtf8OfClassInfo(ConvertTool.B2S(infoValue[1], infoValue[2]));
+        ConstantPoolNameAndTypeInfo nameAndTypeInfo = (ConstantPoolNameAndTypeInfo) constantPool.get(ConvertTool.B2S(infoValue[3], infoValue[4]));
         nameAndTypeInfo.ldc(constantPool);
         this.name = nameAndTypeInfo.getName();
         this.desc = nameAndTypeInfo.getDesc();

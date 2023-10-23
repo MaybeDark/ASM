@@ -1,8 +1,7 @@
-package org.bytecode.method;
+package org.bytecode;
 
 import org.Access;
 import org.Type;
-import org.bytecode.ClassWriter;
 import org.bytecode.attributes.linenumbertable.LineNumberTable;
 import org.wrapper.LocalVariableWrapper;
 import org.wrapper.MethodWrapper;

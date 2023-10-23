@@ -1,8 +1,6 @@
-package org.bytecode.field;
+package org.bytecode;
 
 import org.Type;
-import org.bytecode.ByteCodeWriter;
-import org.bytecode.ClassWriter;
 import org.bytecode.attributes.Attribute;
 import org.bytecode.attributes.Signature;
 import org.bytecode.attributes.Target;

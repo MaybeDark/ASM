@@ -106,8 +106,7 @@ public class BootstrapMethods extends Attribute {
                 .putInt(attributeLength)
                 .putShort(bootStrapMethodCount);
         for (int i = 0; i < bootStrapMethodCount; i++) {
-            BootstrapMethod bootstrapMethod = pool.get(i);
-            result.putArray(bootstrapMethod.getValue());
+            result.putArray(pool.get(i).getValue());
         }
         return result.end();
     }

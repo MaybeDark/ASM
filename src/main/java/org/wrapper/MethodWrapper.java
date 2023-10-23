@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
-import static org.bytecode.method.ConstructorWriter.CONSTRUCTOR_METHODNAME;
+import static org.bytecode.ConstructorWriter.CONSTRUCTOR_METHODNAME;
 
 public class MethodWrapper {
 

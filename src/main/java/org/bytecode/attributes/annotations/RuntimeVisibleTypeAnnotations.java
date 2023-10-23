@@ -5,28 +5,24 @@ import org.bytecode.attributes.Target;
 import org.bytecode.attributes.VariableLengthAttribute;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVector;
+import org.tools.ByteVectors;
 
 /**
- * 运行时可见注解
- * <p>@Retention(RetentionPolicy.RUNTIME)</p>
- * public @interface Annotation{}
+ * <p>@Target(ElementType.TYPE_USE)</p>
+ * public @interface TypeAnnotation{}
  */
-public class RuntimeVisibleAnnotations extends VariableLengthAttribute {
+public class RuntimeVisibleTypeAnnotations extends VariableLengthAttribute {
 
-    Annotations<AnnotationInfo> annotations = new Annotations<>();
+    protected Annotations<TypeAnnotationInfo> annotations = new Annotations<>();
 
-    public RuntimeVisibleAnnotations() {
-        this("RuntimeVisibleAnnotations");
+    public RuntimeVisibleTypeAnnotations() {
+        super((byte) (Target.method_info | Target.field_info | Target.class_info | Target.code_info));
+        attributeName = "RuntimeVisibleTypeAnnotations";
     }
 
-    protected RuntimeVisibleAnnotations(String attributeName) {
-        super((byte) (Target.class_info | Target.field_info | Target.method_info));
+    protected RuntimeVisibleTypeAnnotations(String attributeName) {
+        super((byte) (Target.method_info | Target.field_info | Target.class_info | Target.code_info));
         this.attributeName = attributeName;
-    }
-
-    public RuntimeVisibleAnnotations addAnnotation(AnnotationInfo annotationInfo) {
-        annotations.addAnnotationInfo(annotationInfo);
-        return this;
     }
 
     @Override
@@ -34,7 +30,7 @@ public class RuntimeVisibleAnnotations extends VariableLengthAttribute {
         byteVector.skip(4);
         short annotationCount = byteVector.getShort();
         for (int i = 0; i < annotationCount; i++) {
-            annotations.addAnnotationInfo(AnnotationInfo.visitAnnotation(constantPool, byteVector));
+            annotations.addAnnotationInfo(TypeAnnotationInfo.visitTypeAnnotation(constantPool, byteVector));
         }
         return this;
     }
@@ -46,12 +42,11 @@ public class RuntimeVisibleAnnotations extends VariableLengthAttribute {
 
     @Override
     public byte[] toByteArray() {
-        checkLoaded();
-        ByteVector byteVectors = new ByteVector(6 + attributeLength);
+        ByteVectors byteVectors = new ByteVectors();
         byteVectors.putShort(cpIndex)
                 .putInt(attributeLength)
                 .putArray(annotations.toByteArray());
-        return byteVectors.end();
+        return byteVectors.toByteArray();
     }
 
     @Override

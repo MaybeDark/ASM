@@ -40,6 +40,6 @@ public class ConstantPoolClassInfo extends SymbolicReferenceConstantPoolInfo imp
 
     @Override
     public void ldc(ConstantPool constantPool) {
-        classInfo = ((ConstantPoolUtf8Info) constantPool.get(ConvertTool.B2S(value))).getLiteral();
+        classInfo = constantPool.getUtf8(ConvertTool.B2S(value));
     }
 }

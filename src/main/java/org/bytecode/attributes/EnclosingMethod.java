@@ -3,6 +3,7 @@ package org.bytecode.attributes;
 import org.bytecode.constantpool.ConstantPool;
 import org.tools.ByteVector;
 
+//TODO
 public class EnclosingMethod extends FixedLengthAttribute {
 
     public EnclosingMethod() {
