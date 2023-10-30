@@ -94,7 +94,7 @@ public class ClassWriter implements ByteCodeWriter {
         return methodWriter;
     }
 
-    protected MethodWriter addMethod(int access, String methodName, String methodDesc) {
+    public MethodWriter addMethod(int access, String methodName, String methodDesc) {
         MethodWriter methodWriter = new MethodWriter(this, access, methodName, methodDesc);
         addMethod0(methodWriter);
         return methodWriter;
@@ -113,6 +113,7 @@ public class ClassWriter implements ByteCodeWriter {
         addMethod0(constructorWriter);
         return constructorWriter;
     }
+
 
     public FieldWriter addField(int access, String fieldName, Type fieldType){
         FieldWriter newField = new FieldWriter(this, access, fieldName, fieldType);
@@ -207,7 +208,7 @@ public class ClassWriter implements ByteCodeWriter {
         return constantPool;
     }
 
-    public String getClassName() {
+    public String getClassInfo() {
         return thisClass.getClassInfo();
     }
 }

@@ -29,10 +29,10 @@ public class ExceptionTable {
     }
 
     public byte[] toByteArray() {
-        if (loaded) {
+        if (! loaded) {
             throw new RuntimeException("not loaded");
         }
-        ByteVector byteVector = new ByteVector(2 + 4 * handlerCount);
+        ByteVector byteVector = new ByteVector(2 + 8 * handlerCount);
         byteVector.putShort(handlerCount);
         if (! isEmpty()) {
             handlers.forEach(handler -> {
@@ -43,6 +43,10 @@ public class ExceptionTable {
             });
         }
         return byteVector.end();
+    }
+
+    public void putHandler(int startPc, int endPc, int handlerPc, Type type) {
+        putHandler((short) startPc, (short) endPc, (short) handlerPc, type);
     }
 
     class ExceptionHandler {

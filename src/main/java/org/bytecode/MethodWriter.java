@@ -285,6 +285,11 @@ public class MethodWriter implements ByteCodeWriter {
         return this;
     }
 
+    public MethodWriter putExceptionToStack(Class<? extends Throwable> exception) {
+        code.putExceptionToStack(exception);
+        return this;
+    }
+
     public MethodWriter return_() {
         code.return0();
         return this;

@@ -49,7 +49,7 @@ public class BootstrapMethods extends Attribute {
             throw new TypeErrorException("functionInterface must be a FunctionInterface");
         }
         String lambdaMethodDesc = Type.getMethodDescriptor(functionInterface.getDeclaredMethods()[0]);
-        ConstantPoolMethodHandleInfo handleInfo = new ConstantPoolMethodHandleInfo(ReferenceKind.REF_invokeStatic, writer.getClassName(), "", lambdaMethodDesc);
+        ConstantPoolMethodHandleInfo handleInfo = new ConstantPoolMethodHandleInfo(ReferenceKind.REF_invokeStatic, writer.getClassInfo(), "", lambdaMethodDesc);
         BootstrapMethod bootStrapMethod = new BootstrapMethod(
                 ReferenceKind.REF_invokeStatic
                 , LAMBDAMETAFACTORY_CLASSNAME
