@@ -6,7 +6,6 @@ import org.bytecode.FieldWriter;
 import org.bytecode.MethodWriter;
 import org.bytecode.attributes.code.Code;
 import org.bytecode.constantpool.info.ConstantPoolClassInfo;
-import org.bytecode.constantpool.info.ConstantPoolUtf8Info;
 import org.exception.NoSupportException;
 import org.tools.ByteVector;
 import org.wrapper.ClassWrapper;
@@ -43,7 +42,7 @@ public class ClassVisitor extends ClassWriter {
     public ClassVisitor visit() {
         checkHeader(byteCode.getArray(4));
         checkVersion(byteCode.getInt());
-        constantPool.visit(constantPool, byteCode, true);
+        constantPool.visit(byteCode, true);
         access = byteCode.getShort();
         ConstantPoolClassInfo classInfo = (ConstantPoolClassInfo) constantPool.get(byteCode.getShort());
         this.thisClass = new ClassWrapper(Type.getType(Type.getClassDescriptor(classInfo.getClassInfo())));
@@ -71,9 +70,9 @@ public class ClassVisitor extends ClassWriter {
         short methodCount = byteCode.getShort();
         for (int i = 0; i < methodCount; i++) {
             int access = byteCode.getShort();
-            ConstantPoolUtf8Info methodName = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-            ConstantPoolUtf8Info methodDesc = (ConstantPoolUtf8Info) constantPool.get(byteCode.getShort());
-            MethodWriter methodWriter = addMethod(access, methodName.getLiteral(), methodDesc.getLiteral());
+            String methodName = constantPool.getUtf8(byteCode.getShort());
+            String methodDesc = constantPool.getUtf8(byteCode.getShort());
+            MethodWriter methodWriter = addMethod(access, methodName, methodDesc);
             short attrCount = byteCode.getShort();
             for (int j = 0; j < attrCount; j++) {
                 methodWriter.addAttribute(attributeHelper.visit(constantPool, byteCode));

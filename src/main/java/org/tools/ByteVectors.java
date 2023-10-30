@@ -1,5 +1,6 @@
 package org.tools;
 
+import javax.management.RuntimeErrorException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,11 +65,23 @@ public class ByteVectors{
         return this;
     }
 
-    private byte[] putPartArray(final byte[] bytes){
+    public boolean tryRemove(int length) {
+        try {
+            if (writePoint.remove(length)) {
+                this.writeLength -= length;
+                this.length -= length;
+            }
+        } catch (RuntimeErrorException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private byte[] putPartArray(final byte[] bytes) {
         byte[] part = new byte[4];
-        int i = 0,index = 0;
-        for (; i < Math.floorDiv(SIZE-writeLength , 4); i++,index+=4) {
-            System.arraycopy(bytes,index,part,0,4);
+        int i = 0, index = 0;
+        for (; i < Math.floorDiv(SIZE - writeLength, 4); i++, index += 4) {
+            System.arraycopy(bytes, index, part, 0, 4);
             writePoint.putArray(part);
         }
         writeLength += index;

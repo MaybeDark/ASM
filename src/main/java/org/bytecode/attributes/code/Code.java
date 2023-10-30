@@ -16,7 +16,6 @@ import org.bytecode.attributes.code.instruction.InstructionSet;
 import org.bytecode.attributes.code.instruction.Operator;
 import org.bytecode.attributes.stackmaptable.StackMapTable;
 import org.bytecode.constantpool.ConstantPool;
-import org.bytecode.constantpool.info.ConstantPoolClassInfo;
 import org.exception.TypeErrorException;
 import org.tools.ArrayTool;
 import org.tools.ByteVector;
@@ -75,7 +74,7 @@ public class Code extends VariableLengthAttribute {
 
         bracketStack.put(new Bracket(0));
         returnInst = codeHelper.return0(owner.getReturnType());
-        attributes.put("LocalVariableTable", locals);
+//        attributes.put("LocalVariableTable", locals);
         initStackMapTable();
         return this;
     }
@@ -532,7 +531,6 @@ public class Code extends VariableLengthAttribute {
     public void end() {
         if (isEnd)
             return;
-        return0();
         while (! bracketStack.isEmpty()) {
             endBracket();
         }
@@ -581,7 +579,7 @@ public class Code extends VariableLengthAttribute {
             exceptionTable.putHandler(byteVector.getShort(),
                     byteVector.getShort(),
                     byteVector.getShort(),
-                    Type.getType(Type.getClassDescriptor(((ConstantPoolClassInfo) constantPool.get(byteVector.getShort())).getClassInfo())));
+                    Type.getType(Type.getClassDescriptor(constantPool.getUtf8OfClassInfo(byteVector.getShort()))));
         }
     }
 
@@ -665,6 +663,7 @@ public class Code extends VariableLengthAttribute {
             if (attribute != null)
                 attribute.load(cp);
         }
+        exceptionTable.load(cp);
         return cpIndex;
     }
 
@@ -694,7 +693,8 @@ public class Code extends VariableLengthAttribute {
         attributeLength += 4; //stackMax localsMax
         attributeLength += 4; //codeLength
         attributeLength += getCodeLength();
-        attributeLength += 2; //exceptionCount
+        byte[] exBytes = exceptionTable.toByteArray();
+        attributeLength += exBytes.length;
         attributeLength += 2; //attributeCount
         for (Attribute attribute : attributes.values()) {
             if (attribute != null) {
@@ -711,7 +711,7 @@ public class Code extends VariableLengthAttribute {
                 .putShort(locals.getMax())
                 .putInt(codeLength)
                 .putArray(codeToByteArray())
-                .putArray(exceptionTable.toByteArray())
+                .putArray(exBytes)
                 .putShort(attributeCount)
                 .putArray(attrBytes);
         attributeLength = 0;
@@ -724,5 +724,17 @@ public class Code extends VariableLengthAttribute {
             byteVectors.putArray(instruction.toByteArray());
         }
         return byteVectors.toByteArray();
+    }
+
+    public Map<String, Attribute> getAttributes() {
+        return attributes;
+    }
+
+    public ExceptionTable getExceptionTable() {
+        return exceptionTable;
+    }
+
+    public void putExceptionToStack(Class<? extends Throwable> exception) {
+        stack.put(Type.getType(exception));
     }
 }

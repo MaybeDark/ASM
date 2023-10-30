@@ -173,7 +173,7 @@ public class ConstantPool extends AbsConstantPool implements Visitor<ConstantPoo
     public String getUtf8(int index) {
         AbsConstantPoolInfo absConstantPoolInfo = get(index);
         if (! (absConstantPoolInfo instanceof ConstantPoolUtf8Info))
-            throw new RuntimeException("constantPool[index] not a utf8_info");
+            throw new RuntimeException("constantPool[" + index + "] not a utf8_info");
         return ((ConstantPoolUtf8Info) absConstantPoolInfo).getLiteral();
     }
 
@@ -204,8 +204,8 @@ public class ConstantPool extends AbsConstantPool implements Visitor<ConstantPoo
         return this;
     }
 
-    public ConstantPool visit(ConstantPool constantPool, ByteVector byteVector, boolean complete) {
-        visit(constantPool, byteVector);
+    public ConstantPool visit(ByteVector byteVector, boolean complete) {
+        visit(this, byteVector);
         if (complete) {
             complete();
         }

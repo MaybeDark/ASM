@@ -9,7 +9,6 @@ import org.bytecode.attributes.innerclass.InnerClasses;
 import org.bytecode.attributes.linenumbertable.LineNumberTable;
 import org.bytecode.attributes.stackmaptable.StackMapTable;
 import org.bytecode.constantpool.ConstantPool;
-import org.bytecode.constantpool.info.ConstantPoolUtf8Info;
 import org.tools.ByteVector;
 
 import java.util.HashMap;
@@ -64,7 +63,7 @@ public class AttributeHelper implements Visitor<Attribute> {
 
     @Override
     public Attribute visit(ConstantPool constantPool, ByteVector byteVector) {
-        String attributeName = ((ConstantPoolUtf8Info) constantPool.get(byteVector.getShort())).getLiteral();
+        String attributeName = constantPool.getUtf8(byteVector.getShort());
         Class<? extends Attribute> attributeClass = attributeMap.get(attributeName);
         if (attributeClass == null) {
             throw new RuntimeException("no support " + attributeName);

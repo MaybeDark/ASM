@@ -2,6 +2,9 @@ package org.bytecode.attributes.code.instruction;
 
 import org.tools.ArrayTool;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class Instruction {
     public final byte opcode;
     private byte[] operand;
@@ -43,5 +46,20 @@ public class Instruction {
 
     public byte[] getOperand() {
         return operand;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Instruction that = (Instruction) o;
+        return opcode == that.opcode && Arrays.equals(operand, that.operand);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(opcode);
+        result = 31 * result + Arrays.hashCode(operand);
+        return result;
     }
 }

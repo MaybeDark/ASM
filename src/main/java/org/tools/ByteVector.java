@@ -46,13 +46,22 @@ public class ByteVector {
         return this;
     }
 
-    public ByteVector putArray(final byte[] a){
-        System.arraycopy(a,0,data,this.writePoint,a.length);
+    public boolean remove(int length) {
+        int temp = writePoint;
+        if ((temp = temp - length) < 0) {
+            throw new RuntimeException("Insufficient length,now length is " + temp);
+        }
+        writePoint = temp;
+        return true;
+    }
+
+    public ByteVector putArray(final byte[] a) {
+        System.arraycopy(a, 0, data, this.writePoint, a.length);
         writePoint += a.length;
         return this;
     }
 
-    public byte getByte(){
+    public byte getByte() {
         return data[readPoint++];
     }
 
@@ -82,6 +91,7 @@ public class ByteVector {
         readPoint += length;
         return bytes;
     }
+
 
     public void mark() {
         mark = readPoint;

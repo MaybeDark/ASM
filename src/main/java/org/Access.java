@@ -10,7 +10,7 @@ public interface Access{
     short ACC_SYNCHRONIZED = 0x0020;
     short ACC_VOLATILE = 0x0040;
     short ACC_BRIDGE = 0x0040;
-    short ACC_VARARGS = 0x0080;
+    short ACC_VARARGS = 0x0080; //可变长度参数
     short ACC_TRANSIENT = 0x0080;
     short ACC_NATIVE = 0x0100;
     short ACC_INTERFACE = 0x0200;
@@ -19,6 +19,7 @@ public interface Access{
     short ACC_SYNTHETIC = 0x1000;
     short ACC_ANNOTATION = 0x2000;
     short ACC_ENUM = 0x4000;
+
 //    过时的访问标志
 //    short ACC_MANDATED = 0x8000;
 //    short ACC_DEPRECATED = 0x20000;
