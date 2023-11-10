@@ -25,3 +25,43 @@
  - 1.可视化界面
  - 2.idea插件
  - 3.面向对象语言解释器
+ - 
+### 项目结构
+``` lua
+mall
+├── mall-bytecode
+ ├── mall-attributes JVMS定义了30个attribute用于让JVM正确的解读字节码文件
+  ├── mall-必要的;对于 Java 虚拟机正确解释文件至关重要
+   ├── mall-ConstantValue
+   ├── mall-Code
+   ├── mall-StackMapTable
+   ├── mall-BootstrapMethods
+   ├── mall-NestHost
+   ├── mall-NestMembers
+   ├── mall-PermittedSubclasses
+  ├── mall-可选的;使Java 虚拟机正确解读Java SE的库或者有用的工具
+   ├── mall-Exceptions
+   ├── mall-InnerClasses
+   ├── mall-EnclosingMethod
+   ├── mall-Synthetic
+   ├── mall-Signature
+   ├── mall-Record
+   ├── mall-SourceFile
+   ├── mall-LineNumberTable
+   ├── mall-LocalVariableTable
+   ├── mall-LocalVariableTypeTable
+  ├── mall-含元数据的;对于Java 虚拟机对文件的正确解释并不重要，但包含有关文件的元数据，这些元数据由 Java SE 平台或由工具提供
+   ├── mall-SourceDebugExtension
+   ├── mall-Deprecated
+   ├── mall-RuntimeVisibleAnnotations
+   ├── mall-RuntimeInvisibleAnnotations
+   ├── mall-RuntimeVisibleParameterAnnotations
+   ├── mall-RuntimeInvisibleParameterAnnotations
+   ├── mall-RuntimeVisibleTypeAnnotations
+   ├── mall-RuntimeInvisibleTypeAnnotations
+   ├── mall-AnnotationDefault
+   ├── mall-MethodParameters
+   ├── mall-Module
+   ├── mall-ModulePackages
+   ├── mall-ModuleMainClass
+├── mall-constantpool 字节码常量池，在准备
