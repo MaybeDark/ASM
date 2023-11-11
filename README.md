@@ -9,13 +9,19 @@
     ASM是一个通用的Java字节码操作和分析框架，它可以用来修改现有的类或直接以二进制形式动态生成类。ASM提供了一些常见的字节码转换和分析算法，从中可以构建定制的复杂转换和代码分析工具。ASM提供了与其他Java字节码框架类似的功能，但侧重于性能。因为它的设计和实现都尽可能小和快，所以它非常适合在动态系统中使用（当然也可以以静态方式使用，例如在编译器中）。
 </div>
     
-### 为什么要操纵分析字节码?
-#### 程序分析，发现 bug，检测无用代码
- - JaCoCo(Java Code Coverage Library 用于检查单元测试覆盖率)
-#### 产生代码
- - openJDK lambda、Groovy 编译器、Kotlin 编译器
-#### 优化、混淆代码，注入调试及监控代码等
- - Aspectj
+### ASM有什么用?
+<ol>
+    <li>OpenJDK，生成lambda调用站点，以及Nashorn编译器</li>
+    <li>Groovy编译器和Kotlin编译器</li>
+    <li>Cobertura和Jacoco，以工具化类来度量代码覆盖率</li>
+    <li>CGLIB，用于动态生成代理类</li>
+    <li>Gradle，在运行时生成一些类</li>
+</ol>
+
+
+
+
+
 
 ## 项目介绍
 `mall`本项目重写了JDK中ASM包下所有功能,也新添了字节码相关功能
