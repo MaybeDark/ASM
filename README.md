@@ -25,8 +25,8 @@
 </div>
 
 ## 项目介绍
-<div>&emsp;&emsp;本项目重新实现了JDK中ASM库的功能，在已用的基础上新添字节码相关功能。沿用相关类名和方法名减低新API上手难度,方法调用多为链式调用提供使用性。</div>
-<div>&emsp;&emsp;项目中沿用ClassWriter和ClassVisitor命名,但是操作对象从晦涩难懂的字节数组变为对应的实体类,在使用时只需要编辑对应的实体类,对于方法指令的编辑只需要调用对应的方法和输入必要的参数就会为你生成对应的指令不需要你参照JVMS对操作数一个字节一个字节进行编辑只需告诉它做什么对什么做。</div>
+<div>&emsp;&emsp;本项目重新实现了JDK中ASM库的功能，在已用的基础上新添字节码相关功能。沿用相关类名和方法名减低新API上手难度,方法调用多为链式调用提高使用性。</div>
+<div>&emsp;&emsp;项目中沿用ClassWriter和ClassVisitor命名,但是操作对象从晦涩难懂的字节数组变为对应的实体类,在使用时只需要新建和编辑对应的实体类,对于方法指令的编辑只需要调用对应的方法和输入必要的参数就会为你生成对应的指令不需要你参照JVMS对操作数一个字节一个字节进行编辑只需告诉它做什么对什么做。</div>
 <div>&emsp;&emsp;ClassModify设计理念与原来JDK下的ASM包相似,尽可能的小和快操作对象都是字节数组,在ClassModify中字节码文件内容都已字节数组保存但仍会对不同区域(constantPool、classinfo、methodinfos、fieldinfos、attributes)划分方便使用者修改,MethodProxy中使用ClassModify动态修改模板类生成代理类。相较于ClassWriter牺牲了使用性但是提供效率,适合精通字节码文件结构和规范的使用者快速的生成一份字节码文件。</div>
 <div>&emsp;&emsp;ClassWriter能从0到1的生成一份字节码文件，而ClassVisitor继承于ClassWriter但是提供独特的visit方法可以对已有的字节码文件进行读入并使其进入可编辑的状态;ClassModify既可以从0到1生成一份字节码文件也可以读入已有字节码进行编辑,不过相较前面两者使用难度会更大。</div>
 <br>
@@ -74,7 +74,7 @@
 <div>
     <b>~ 为什么做这项目?</b>
     <br>
-    &emsp;&emsp;我一开始想要做这个项目其实就是学AOP底层的时候了解到了ASM,但是自己用的时候觉得这API太难用了。CGLIB和JDK动态代理也是对ASM进行了定制化去针对他们的使用场景。所以我就想做一个项目去自己实现。
+    &emsp;&emsp;我一开始想要做这个项目其实就是学AOP底层的时候了解到了ASM,但是自己用的时候觉得这API太难用了。CGLIB和JDK动态代理也是对ASM进行了定制化去针对他们的使用场景。所以我就想做一个项目去自己实现,这也是为什么项目会一个MethodProxy模块的原因。
 </div>
 <div>
      <b>~ 收获了什么?</b>
