@@ -17,7 +17,7 @@
 </ol>
 
 ## 项目介绍
-本项目重新实现了ASM，为ClassWriter和ClassVisitor提高了使用性和交互性;ClassModify设计理念与原来JDK下的ASM包相同,尽可能的小和快Class文件的内容都已字节类型保存但仍会做不用区域的划分方便使用者修改,MethodProxy就使用了ClassModify对模板类进行动态修改生成代理类。
+本项目重新实现了ASM，为ClassWriter和ClassVisitor提高了使用性和交互性;ClassModify设计理念与原来JDK下的ASM包相同,尽可能的小和快Class文件的内容都已字节类型保存但仍会做不同区域(constantPool、classinfo、methodinfos、fieldinfos、attributes)的划分方便使用者修改,MethodProxy就使用了ClassModify对模板类进行动态修改生成代理类。
 
 ## 功能介绍
 ### 已实现：
