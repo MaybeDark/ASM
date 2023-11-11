@@ -49,9 +49,16 @@
  - 1.可视化界面 像ByteCodeView,但是会提供修改功能。
  - 2.idea插件 像jclasslib,功能参考可视化界面但是会内嵌到idea中。
  - 3.面向对象语言解释器 让不同的语言编译成字节码文件运行在JVM中。
-### 项目结构
+### 包结构
 ``` lua
 mall
-├── mall-bytecode
+├── mall-bytecode 包含字节码文件内容与ClassWriter
  ├── mall-attributes JVMS定义了30个attribute用于让JVM正确的解读字节码文件,包内是对应的实体类
- ├── mall-constantpool 字节码常量池，在准备阶段会加载的运行时常量池
+ ├── mall-constantpool 字节码常量池,在准备阶段会加载的运行时常量池,有17种info对应不同的功能
+├── mall- exception 自定义异常
+├── mall- modify 功能介绍中提到的ClassModify相关类
+├── mall- proxy 功能介绍中提到的MethodProxy相关类
+├── mall- tools 包内有ArrayTool、ByteVector、ByteVectors、ConvertTool
+├── mall- visitor 功能介绍中提到的ClassVisitor相关类
+├── mall- wrapper 方法需要的参数包装成类,包装类提供快捷的生成方式
+
